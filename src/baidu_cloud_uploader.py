@@ -17,7 +17,7 @@ from dotenv import load_dotenv
 from utils import setup_logging
 
 class BaiduCloudUploader:
-    def __init__(self, file_path=None, config_path: str = './config.env') -> None:
+    def __init__(self, file_path=None, config_path: str = './config/config.env') -> None:
     
         """
         Initializes the uploader with access token and app name.
