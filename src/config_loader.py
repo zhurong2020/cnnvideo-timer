@@ -14,7 +14,7 @@ from typing import Dict, Union, Tuple, Type, Any
 logger = logging.getLogger('config_loader')
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-def load_config(file_path: str = "config.env") -> Dict[str, Any]:
+def load_config(file_path: str = "config/config.env") -> Dict[str, Any]:
     """
     Load configuration values from an environment file.
     

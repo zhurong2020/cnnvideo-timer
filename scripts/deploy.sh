@@ -58,7 +58,7 @@ function configure_timezone {
 }
 
 function schedule_cron_job {
-    (crontab -l 2>/dev/null; echo "0 20 * * * cd $(pwd) && ./venv/bin/python3 scheduler.py >> cron.log 2>&1") | crontab -
+    (crontab -l 2>/dev/null; echo "0 20 * * * cd $(pwd) && ./venv/bin/python3 src/scheduler.py >> cron.log 2>&1") | crontab -
     if [ $? -ne 0 ]; then
         echo "Error: Failed to update crontab."
         exit 1

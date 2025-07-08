@@ -19,7 +19,7 @@ gh-actions.pub
 /tmp/
 /metadata/
 /.github/
-/.venv/
+/venv/
 __pycache__/
 /build/
 /dist/
