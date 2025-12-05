@@ -1,27 +1,40 @@
-# requirements.txt v2.0.0
-# CNN Video Timer - Dependencies
+# SmartNews Learn v2.0.0 - Dependencies
+# AI-Powered News Video Platform for Language Learning
 #
 # Install with: pip install -r requirements.txt
+# For development: pip install -r requirements-dev.txt
 
-# API Framework
-fastapi>=0.104.0        # Modern web framework
-uvicorn[standard]>=0.24.0  # ASGI server
-pydantic>=2.5.0         # Data validation
-pydantic-settings>=2.1.0  # Settings management
+# =============================================================================
+# Core API Framework
+# =============================================================================
+fastapi>=0.104.0           # Modern async web framework
+uvicorn[standard]>=0.24.0  # ASGI server with uvloop
+pydantic>=2.5.0            # Data validation
+pydantic-settings>=2.1.0   # Settings management with .env support
 
-# Core dependencies
-yt-dlp>=2024.1.0        # Video downloader (use latest for best compatibility)
-apscheduler>=3.10.0     # Task scheduler
-python-dotenv>=1.0.0    # Environment variable management
-requests>=2.31.0        # HTTP client
+# =============================================================================
+# Video Download & Processing
+# =============================================================================
+yt-dlp>=2024.1.0           # Video downloader (keep updated for best compatibility)
+ffmpeg-python>=0.2.0       # FFmpeg Python wrapper
 
-# UI and Progress
-tqdm>=4.66.0            # Progress bars
-rich>=13.0.0            # Beautiful terminal output
+# =============================================================================
+# Core Utilities
+# =============================================================================
+apscheduler>=3.10.0        # Task scheduler (for legacy CLI)
+python-dotenv>=1.0.0       # Environment variable management
+requests>=2.31.0           # HTTP client
+tqdm>=4.66.0               # Progress bars
+rich>=13.0.0               # Beautiful terminal output
 
-# Video Processing
-ffmpeg-python>=0.2.0    # FFmpeg Python wrapper
+# =============================================================================
+# Database (SQLite - included in Python stdlib)
+# =============================================================================
+aiosqlite>=0.19.0          # Async SQLite support (optional)
 
-# Subtitle Generation (optional - install separately for VPS with limited resources)
-# faster-whisper>=0.10.0  # Faster and lighter than original whisper
+# =============================================================================
+# Subtitle Generation (Optional - install separately for resource-limited VPS)
+# =============================================================================
+# faster-whisper>=0.10.0   # AI subtitle generation
 # Install with: pip install faster-whisper
+# Note: Requires ~1GB RAM for 'tiny' model, ~2GB for 'base' model

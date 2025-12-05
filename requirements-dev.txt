@@ -1,0 +1,34 @@
+# SmartNews Learn v2.0.0 - Development Dependencies
+#
+# Install with: pip install -r requirements-dev.txt
+# This includes all production dependencies plus dev tools
+
+# Include production dependencies
+-r requirements.txt
+
+# =============================================================================
+# Testing
+# =============================================================================
+pytest>=7.0.0              # Test framework
+pytest-cov>=4.0.0          # Coverage reporting
+pytest-asyncio>=0.21.0     # Async test support
+httpx>=0.25.0              # Async HTTP client for testing
+
+# =============================================================================
+# Code Quality
+# =============================================================================
+black>=23.0.0              # Code formatter
+ruff>=0.1.0                # Fast Python linter
+mypy>=1.0.0                # Static type checker
+types-requests>=2.31.0     # Type stubs for requests
+
+# =============================================================================
+# Security
+# =============================================================================
+bandit>=1.7.0              # Security linter
+
+# =============================================================================
+# Development Tools
+# =============================================================================
+pre-commit>=3.0.0          # Git hooks framework
+ipython>=8.0.0             # Enhanced Python shell (optional)
