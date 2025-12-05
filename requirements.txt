@@ -1,9 +1,27 @@
-# requirements.txt version 1.0.1
-# This file lists the required libraries and their versions for this project. 
-# Use this file to ensure the correct dependencies are installed, especially when setting up the project for the first time or on a new machine.
+# requirements.txt v2.0.0
+# CNN Video Timer - Dependencies
+#
+# Install with: pip install -r requirements.txt
 
-apscheduler==3.10.4     # Advanced Python Scheduler for job scheduling
-python-dotenv==1.0.0    # Load environment variables from .env file
-requests==2.31.0        # HTTP library for sending requests and handling responses
-yt_dlp==2023.10.7       # Command-line program to download videos from YouTube.com and other video sites
-tqdm==4.66.1            # Progress bar for command-line programs
+# API Framework
+fastapi>=0.104.0        # Modern web framework
+uvicorn[standard]>=0.24.0  # ASGI server
+pydantic>=2.5.0         # Data validation
+pydantic-settings>=2.1.0  # Settings management
+
+# Core dependencies
+yt-dlp>=2024.1.0        # Video downloader (use latest for best compatibility)
+apscheduler>=3.10.0     # Task scheduler
+python-dotenv>=1.0.0    # Environment variable management
+requests>=2.31.0        # HTTP client
+
+# UI and Progress
+tqdm>=4.66.0            # Progress bars
+rich>=13.0.0            # Beautiful terminal output
+
+# Video Processing
+ffmpeg-python>=0.2.0    # FFmpeg Python wrapper
+
+# Subtitle Generation (optional - install separately for VPS with limited resources)
+# faster-whisper>=0.10.0  # Faster and lighter than original whisper
+# Install with: pip install faster-whisper
