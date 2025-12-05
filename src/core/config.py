@@ -1,0 +1,88 @@
+"""
+Configuration management using Pydantic Settings.
+
+Provides type-safe configuration with validation and environment variable support.
+"""
+
+from functools import lru_cache
+from pathlib import Path
+from typing import Optional
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    """Application settings with validation."""
+
+    model_config = SettingsConfigDict(
+        env_file="config/config.env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    # App settings
+    app_name: str = "SmartNews Learn"
+    app_version: str = "2.0.0"
+    debug: bool = False
+
+    # API settings
+    api_host: str = "0.0.0.0"
+    api_port: int = 8000
+    api_key: Optional[str] = None  # For WordPress authentication
+
+    # Paths
+    data_dir: Path = Path("./data")
+    temp_dir: Path = Path("./data/temp")
+    log_dir: Path = Path("./log")
+
+    # Database
+    database_url: str = "sqlite+aiosqlite:///./data/tasks.db"
+
+    # YouTube settings
+    youtube_url: str = "https://www.youtube.com/@CNN10/videos"
+    youtube_base_url: str = "https://www.youtube.com"
+    youtube_video_pattern: str = r"/watch\?v=([a-zA-Z0-9_-]+)"
+
+    # Download settings
+    download_path: Path = Path("./data/temp")
+    max_videos_to_download: int = 1
+    max_download_retries: int = 3
+    request_timeout: int = 30
+    max_resolution: int = 720
+    video_extension: str = ".mp4"
+
+    # Whisper settings (for subtitle generation)
+    whisper_model: str = "base"  # tiny, base, small, medium, large
+    whisper_language: str = "en"
+
+    # FFmpeg settings
+    ffmpeg_path: Optional[str] = None  # Auto-detect if None
+
+    # Task settings
+    max_concurrent_tasks: int = 2
+    task_retention_hours: int = 24  # Keep completed tasks for 24 hours
+
+    # OneDrive (rclone) settings
+    rclone_remote: Optional[str] = None  # e.g., "onedrive:videos"
+    enable_onedrive: bool = False
+
+    # SMTP settings (for notifications)
+    smtp_server: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_username: Optional[str] = None
+    smtp_password: Optional[str] = None
+    smtp_sender: Optional[str] = None
+    smtp_receiver: Optional[str] = None
+
+    def ensure_directories(self) -> None:
+        """Create necessary directories if they don't exist."""
+        self.data_dir.mkdir(parents=True, exist_ok=True)
+        self.temp_dir.mkdir(parents=True, exist_ok=True)
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+
+
+@lru_cache
+def get_settings() -> Settings:
+    """Get cached settings instance."""
+    settings = Settings()
+    settings.ensure_directories()
+    return settings
