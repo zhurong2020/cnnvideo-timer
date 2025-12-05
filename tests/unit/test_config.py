@@ -14,6 +14,7 @@ class TestSettings:
         """Test default configuration values."""
         # Clear cache to get fresh settings
         from src.core.config import get_settings
+
         get_settings.cache_clear()
 
         settings = get_settings()
@@ -25,6 +26,7 @@ class TestSettings:
     def test_debug_mode_from_env(self, test_config):
         """Test DEBUG mode is read from environment."""
         from src.core.config import get_settings
+
         get_settings.cache_clear()
 
         settings = get_settings()
@@ -35,6 +37,7 @@ class TestSettings:
     def test_api_key_from_env(self, test_config):
         """Test API_KEY is read from environment."""
         from src.core.config import get_settings
+
         get_settings.cache_clear()
 
         settings = get_settings()

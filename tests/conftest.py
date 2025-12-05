@@ -31,6 +31,7 @@ def app(test_config):
     """Create FastAPI app instance for testing."""
     # Import here to ensure test config is applied first
     from src.api.main import create_app
+
     return create_app()
 
 

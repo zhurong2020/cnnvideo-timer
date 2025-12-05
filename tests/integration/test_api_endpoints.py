@@ -99,19 +99,13 @@ class TestTasksEndpoint:
 
     def test_get_nonexistent_task(self, client, api_headers):
         """Test getting non-existent task returns 404."""
-        response = client.get(
-            "/api/v1/tasks/nonexistent-id",
-            headers=api_headers
-        )
+        response = client.get("/api/v1/tasks/nonexistent-id", headers=api_headers)
 
         assert response.status_code == 404
 
     def test_delete_nonexistent_task(self, client, api_headers):
         """Test deleting non-existent task returns 404."""
-        response = client.delete(
-            "/api/v1/tasks/nonexistent-id",
-            headers=api_headers
-        )
+        response = client.delete("/api/v1/tasks/nonexistent-id", headers=api_headers)
 
         assert response.status_code == 404
 

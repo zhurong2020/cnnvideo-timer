@@ -72,8 +72,7 @@ class TestAPIAuthentication:
     def test_preview_endpoint_requires_auth(self, client):
         """Test preview endpoint requires API key."""
         response = client.post(
-            "/api/v1/sources/preview",
-            json={"url": "https://youtube.com/watch?v=test"}
+            "/api/v1/sources/preview", json={"url": "https://youtube.com/watch?v=test"}
         )
 
         assert response.status_code == 401
