@@ -1,26 +1,86 @@
-# gitignore v1.0.4
-# *.env  # environment variables, *.mp4 downloaded video, *.txt version, Inno Setup
-# *.iss Inno Setup script, gh-actions private key, gh-actions.pub public key, /videos/ downloaded videos
-# /log/ log files, /bin/ compiled binaries, /tmp/ temporary files, /metadata/ metadata files 
-# /.github/ GitHub Actions, __pycache__/ Python cache, *.pyc Python cache, /build/ compiled binaries
-# /dist/ compiled binaries
-*.env
-*.mp4   
-*.txt
-*.rtf   
-*.iss   
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
 *.pyc
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Configuration
+config/config.env
+*.env
+
+# Logs
+*.log
+log/
+logs/
+
+# Data & Media
+data/
+!data/.gitkeep
+temp/
+tmp/
+videos/
+metadata/
+*.mp4
+*.webm
+*.mkv
+*.avi
+*.srt
+*.vtt
+*.wav
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Distribution
+*.zip
+*.tar.gz
+*.iss
 *.ps1
+bin/ffmpeg.exe
+bin/ffprobe.exe
+bin/ffplay.exe
+
+# Misc
 gh-actions
 gh-actions.pub
-/videos/
-/log/
-/bin/
-/tmp/
-/metadata/
-/.github/
-/venv/
-__pycache__/
-/build/
-/dist/
-/admin/
+.claude/
+admin/

@@ -22,7 +22,8 @@ class MetadataManager:
         Returns:
         - None
         """
-        self.metadata_file_path = config['METADATA_FILE']  
+        self.metadata_file_path = config['METADATA_FILE']
+        self.default_metadata_extractor = config.get('DEFAULT_METADATA_EXTRACTOR', 'yt_dlp')  
 
     def save_or_update_metadata(self, metadata):
         """Save or update the metadata of a video.

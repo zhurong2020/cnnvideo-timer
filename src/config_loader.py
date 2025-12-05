@@ -17,10 +17,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 def load_config(file_path: str = "config/config.env") -> Dict[str, Any]:
     """
     Load configuration values from an environment file.
-    
-    Arus:
-    - file_path : str : Path to the environment file (default is "config.env").
-    
+
+    Args:
+    - file_path : str : Path to the environment file (default is "config/config.env").
+
     Returns:
     - dict : A dictionary containing the configuration values.
     """
@@ -49,7 +49,6 @@ def load_config(file_path: str = "config/config.env") -> Dict[str, Any]:
         "LOG_FILENAME": (str, "video_downloader.log"),
         "LOG_DIRECTORY": (str,"./log"),
         "VIDEO_DIRECTORY": (str, "./videos"),
-        "VIDEO_EXTENSION": (str, ".mp4"),
         "DOWNLOAD_COMPLETE_MESSAGE": (str, "All downloads completed. {} videos downloaded."),
         "VIEW_METADATA_PROMPT": (str,"Would you like to view the metadata for downloaded videos? (y/n):"),
         "AFFIRMATIVE_RESPONSE": (str, "y"),

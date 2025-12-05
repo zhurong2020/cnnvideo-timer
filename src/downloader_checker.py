@@ -138,14 +138,14 @@ class DownloaderManager:
     
     def get_suitable_formats(self, video_url: str) -> List[str]:
         """Get a list of suitable format IDs for a given video URL.
-        
-        Arus:
+
+        Args:
         - video_url : str : The URL of the video to get suitable formats for.
 
         Returns:
         - List[str] : A list of strings representing suitable format IDs for the video, sorted by file size.
         """
-        max_resolution = self.config.get('MAX_RESOLUTION') 
+        max_resolution = config.get('MAX_RESOLUTION') 
         ydl_opts = {
         'quiet': True,
         'no_progress': True,
