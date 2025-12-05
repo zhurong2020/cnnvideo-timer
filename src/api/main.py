@@ -18,8 +18,7 @@ from ..core.task_manager import get_task_manager
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -73,7 +72,9 @@ def create_app() -> FastAPI:
     )
 
     # CORS middleware - configure allowed origins from settings
-    allowed_origins = settings.cors_origins if hasattr(settings, 'cors_origins') and settings.cors_origins else []
+    allowed_origins = (
+        settings.cors_origins if hasattr(settings, "cors_origins") and settings.cors_origins else []
+    )
     app.add_middleware(
         CORSMiddleware,
         allow_origins=allowed_origins,  # Configure in config.env: CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com

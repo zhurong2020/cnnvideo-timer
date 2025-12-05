@@ -24,10 +24,14 @@ router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 # Request/Response Models
 # ============================================
 
+
 class TierUpdateRequest(BaseModel):
     """Request to update tier configuration."""
+
     daily_tasks: Optional[int] = Field(None, description="Max tasks per day (-1 for unlimited)")
-    max_resolution: Optional[str] = Field(None, description="Max resolution (360p, 480p, 720p, 1080p)")
+    max_resolution: Optional[str] = Field(
+        None, description="Max resolution (360p, 480p, 720p, 1080p)"
+    )
     allowed_modes: Optional[List[str]] = Field(None, description="Allowed processing modes")
     priority: Optional[int] = Field(None, description="Queue priority")
     ai_subtitle: Optional[bool] = Field(None, description="Allow AI subtitle generation")
@@ -40,6 +44,7 @@ class TierUpdateRequest(BaseModel):
 
 class TierResponse(BaseModel):
     """Tier configuration response."""
+
     id: str
     name: str
     description: str
@@ -55,6 +60,7 @@ class TierResponse(BaseModel):
 
 class TiersConfigResponse(BaseModel):
     """All tiers configuration response."""
+
     tiers: List[TierResponse]
     processing_modes: Dict[str, Dict]
     resolutions: List[str]
@@ -62,6 +68,7 @@ class TiersConfigResponse(BaseModel):
 
 class SourceResponse(BaseModel):
     """Video source response."""
+
     id: str
     name: str
     description: str
@@ -80,6 +87,7 @@ class SourceResponse(BaseModel):
 
 class SourcesConfigResponse(BaseModel):
     """All sources configuration response."""
+
     sources: List[SourceResponse]
     categories: Dict[str, Dict]
     difficulty_levels: Dict[str, Dict]
@@ -89,6 +97,7 @@ class SourcesConfigResponse(BaseModel):
 
 class SourceCreateRequest(BaseModel):
     """Request to create a new source."""
+
     name: str = Field(..., description="Source display name")
     description: str = Field(..., description="Source description")
     url: str = Field(..., description="YouTube channel URL")
@@ -105,6 +114,7 @@ class SourceCreateRequest(BaseModel):
 
 class SourceUpdateRequest(BaseModel):
     """Request to update a source."""
+
     name: Optional[str] = None
     description: Optional[str] = None
     url: Optional[str] = None
@@ -123,6 +133,7 @@ class SourceUpdateRequest(BaseModel):
 # Tier Management Endpoints
 # ============================================
 
+
 @router.get("/tiers", response_model=TiersConfigResponse)
 async def get_tiers_config(
     api_key: str = Depends(verify_api_key),
@@ -136,19 +147,21 @@ async def get_tiers_config(
     tiers = []
 
     for tier_id, limits in tier_config.get_all_tiers().items():
-        tiers.append(TierResponse(
-            id=tier_id,
-            name=limits.name or tier_id.capitalize(),
-            description=limits.description or "",
-            daily_tasks=limits.daily_tasks,
-            max_resolution=limits.max_resolution,
-            allowed_modes=limits.allowed_modes,
-            priority=limits.priority,
-            ai_subtitle=limits.ai_subtitle,
-            concurrent_tasks=limits.concurrent_tasks,
-            price_monthly=limits.price_monthly or "",
-            price_yearly=limits.price_yearly or "",
-        ))
+        tiers.append(
+            TierResponse(
+                id=tier_id,
+                name=limits.name or tier_id.capitalize(),
+                description=limits.description or "",
+                daily_tasks=limits.daily_tasks,
+                max_resolution=limits.max_resolution,
+                allowed_modes=limits.allowed_modes,
+                priority=limits.priority,
+                ai_subtitle=limits.ai_subtitle,
+                concurrent_tasks=limits.concurrent_tasks,
+                price_monthly=limits.price_monthly or "",
+                price_yearly=limits.price_yearly or "",
+            )
+        )
 
     return TiersConfigResponse(
         tiers=tiers,
@@ -173,7 +186,7 @@ async def update_tier(
     if tier_id not in tier_config.get_tier_ids():
         raise HTTPException(
             status_code=404,
-            detail=f"Tier '{tier_id}' not found. Available: {tier_config.get_tier_ids()}"
+            detail=f"Tier '{tier_id}' not found. Available: {tier_config.get_tier_ids()}",
         )
 
     # Build updates dict from non-None values
@@ -219,6 +232,7 @@ async def reload_tiers_config(
 # ============================================
 # Source Management Endpoints
 # ============================================
+
 
 @router.get("/sources", response_model=SourcesConfigResponse)
 async def get_sources_config(
@@ -468,6 +482,7 @@ async def reload_sources_config(
 # ============================================
 # System Endpoints
 # ============================================
+
 
 @router.post("/reload-all")
 async def reload_all_config(

@@ -84,9 +84,7 @@ async def process_task_background(task_id: str):
 
         if not result.success:
             manager.update_task(
-                task_id,
-                status=TaskStatus.FAILED,
-                error_message=result.error or "Download failed"
+                task_id, status=TaskStatus.FAILED, error_message=result.error or "Download failed"
             )
             return
 
@@ -110,10 +108,11 @@ async def process_task_background(task_id: str):
             mode=learning_mode,
             video_url=task.video_url,
             whisper_model=settings.whisper_model,
-            progress_callback=lambda cur, total: manager.update_task(
-                task_id,
-                progress=min(50 + int((cur / max(total, 1)) * 40), 90)
-            ) if total > 0 else None,
+            progress_callback=lambda cur, total: (
+                manager.update_task(task_id, progress=min(50 + int((cur / max(total, 1)) * 40), 90))
+                if total > 0
+                else None
+            ),
         )
 
         logger.info(f"[Task {task_id}] Processing completed: {processed_path}")
@@ -135,11 +134,7 @@ async def process_task_background(task_id: str):
 
     except Exception as e:
         logger.error(f"[Task {task_id}] Task failed: {e}", exc_info=True)
-        manager.update_task(
-            task_id,
-            status=TaskStatus.FAILED,
-            error_message=str(e)
-        )
+        manager.update_task(task_id, status=TaskStatus.FAILED, error_message=str(e))
 
 
 @router.post("", response_model=TaskResponse)
@@ -151,6 +146,7 @@ async def create_task(
 ):
     """Create a new video download/processing task."""
     import logging
+
     logger = logging.getLogger(__name__)
 
     settings = get_settings()
@@ -174,15 +170,14 @@ async def create_task(
                 "tier": quota_result.tier,
                 "remaining_today": quota_result.remaining_today,
                 "upgrade_url": "/api/v1/quota/tiers",  # Guide to upgrade
-            }
+            },
         )
 
     # Check concurrent task limit
     pending_count = manager.get_pending_tasks_count()
     if pending_count >= settings.max_concurrent_tasks * 2:  # Allow some queue
         raise HTTPException(
-            status_code=429,
-            detail="Too many pending tasks. Please wait and try again."
+            status_code=429, detail="Too many pending tasks. Please wait and try again."
         )
 
     # Get video info
@@ -191,8 +186,7 @@ async def create_task(
 
     if not video_info:
         raise HTTPException(
-            status_code=400,
-            detail="Could not get video information. Please check the URL."
+            status_code=400, detail="Could not get video information. Please check the URL."
         )
 
     # Create task
@@ -208,7 +202,9 @@ async def create_task(
 
     # Record quota usage
     quota_manager.record_task(user_id)
-    logger.info(f"Task created for user {user_id}, quota remaining: {quota_result.remaining_today - 1}")
+    logger.info(
+        f"Task created for user {user_id}, quota remaining: {quota_result.remaining_today - 1}"
+    )
 
     # Start background processing
     background_tasks.add_task(process_task_background, task.id)

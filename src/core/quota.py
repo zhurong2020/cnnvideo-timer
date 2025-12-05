@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class UserTier(str, Enum):
     """User subscription tiers."""
+
     FREE = "free"
     BASIC = "basic"
     PREMIUM = "premium"
@@ -27,6 +28,7 @@ class UserTier(str, Enum):
 @dataclass
 class TierLimits:
     """Limits for each user tier."""
+
     daily_tasks: int  # Max tasks per day (-1 = unlimited)
     max_resolution: str  # Max allowed resolution
     allowed_modes: List[str]  # Allowed processing modes
@@ -128,7 +130,9 @@ class TierConfigManager:
                 self._resolutions = data.get("resolutions", ["360p", "480p", "720p", "1080p"])
                 self._last_loaded = datetime.now()
 
-                logger.info(f"Loaded tier config from {self.config_path}: {len(self._tier_limits)} tiers")
+                logger.info(
+                    f"Loaded tier config from {self.config_path}: {len(self._tier_limits)} tiers"
+                )
 
             except Exception as e:
                 logger.warning(f"Failed to load tier config: {e}, using defaults")
@@ -143,7 +147,9 @@ class TierConfigManager:
 
     def get_tier_limits(self, tier: str) -> TierLimits:
         """Get limits for a specific tier."""
-        return self._tier_limits.get(tier, self._tier_limits.get("free", DEFAULT_TIER_LIMITS["free"]))
+        return self._tier_limits.get(
+            tier, self._tier_limits.get("free", DEFAULT_TIER_LIMITS["free"])
+        )
 
     def get_all_tiers(self) -> Dict[str, TierLimits]:
         """Get all tier configurations."""
@@ -221,6 +227,7 @@ TIER_LIMITS: Dict[UserTier, TierLimits] = {
 @dataclass
 class UserUsage:
     """User usage tracking."""
+
     user_id: str
     tier: str = "free"
     daily_task_count: int = 0
@@ -240,6 +247,7 @@ class UserUsage:
 @dataclass
 class QuotaCheckResult:
     """Result of quota check."""
+
     allowed: bool
     reason: Optional[str] = None
     remaining_today: int = 0
@@ -277,10 +285,7 @@ class QuotaManager:
         """Save user usage to disk."""
         try:
             with open(self.usage_file, "w") as f:
-                json.dump(
-                    {k: asdict(v) for k, v in self.users.items()},
-                    f, indent=2
-                )
+                json.dump({k: asdict(v) for k, v in self.users.items()}, f, indent=2)
         except Exception as e:
             logger.error(f"Failed to save usage data: {e}")
 
@@ -370,8 +375,14 @@ class QuotaManager:
 
         # Check resolution permission
         resolution_order = ["360p", "480p", "720p", "1080p"]
-        requested_idx = resolution_order.index(video_format) if video_format in resolution_order else 0
-        max_idx = resolution_order.index(limits.max_resolution) if limits.max_resolution in resolution_order else 0
+        requested_idx = (
+            resolution_order.index(video_format) if video_format in resolution_order else 0
+        )
+        max_idx = (
+            resolution_order.index(limits.max_resolution)
+            if limits.max_resolution in resolution_order
+            else 0
+        )
 
         if requested_idx > max_idx:
             return QuotaCheckResult(
@@ -413,7 +424,9 @@ class QuotaManager:
         user.updated_at = datetime.now().isoformat()
 
         self._save_usage()
-        logger.info(f"Recorded task for {user_id}: daily={user.daily_task_count}, total={user.total_tasks}")
+        logger.info(
+            f"Recorded task for {user_id}: daily={user.daily_task_count}, total={user.total_tasks}"
+        )
 
         return user
 
@@ -468,6 +481,7 @@ def get_quota_manager() -> QuotaManager:
     global _quota_manager
     if _quota_manager is None:
         from src.core.config import get_settings
+
         settings = get_settings()
         _quota_manager = QuotaManager(settings.data_dir)
     return _quota_manager

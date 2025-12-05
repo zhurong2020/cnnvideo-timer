@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class VideoInfo:
     """Video file information."""
+
     path: Path
     duration: float  # seconds
     width: int
@@ -71,8 +72,10 @@ class FFmpegProcessor:
         """
         cmd = [
             self.ffprobe,
-            "-v", "quiet",
-            "-print_format", "json",
+            "-v",
+            "quiet",
+            "-print_format",
+            "json",
             "-show_format",
             "-show_streams",
             str(video_path),
@@ -81,29 +84,27 @@ class FFmpegProcessor:
         try:
             result = subprocess.run(cmd, capture_output=True, text=True, check=True)
             import json
+
             data = json.loads(result.stdout)
 
             # Find video stream
-            video_stream = next(
-                (s for s in data['streams'] if s['codec_type'] == 'video'),
-                None
-            )
+            video_stream = next((s for s in data["streams"] if s["codec_type"] == "video"), None)
 
             if not video_stream:
                 raise ValueError("No video stream found")
 
             # Parse FPS
-            fps_parts = video_stream['r_frame_rate'].split('/')
+            fps_parts = video_stream["r_frame_rate"].split("/")
             fps = int(fps_parts[0]) / int(fps_parts[1])
 
             return VideoInfo(
                 path=video_path,
-                duration=float(data['format']['duration']),
-                width=video_stream['width'],
-                height=video_stream['height'],
-                codec=video_stream['codec_name'],
+                duration=float(data["format"]["duration"]),
+                width=video_stream["width"],
+                height=video_stream["height"],
+                codec=video_stream["codec_name"],
                 fps=fps,
-                bitrate=int(data['format'].get('bit_rate', 0)),
+                bitrate=int(data["format"].get("bit_rate", 0)),
             )
 
         except Exception as e:
@@ -130,15 +131,15 @@ class FFmpegProcessor:
         """
         # Default subtitle style
         default_style = {
-            'FontName': 'Arial',
-            'FontSize': 24,
-            'PrimaryColour': '&H00FFFFFF',  # White
-            'OutlineColour': '&H00000000',  # Black outline
-            'BorderStyle': 1,
-            'Outline': 2,
-            'Shadow': 0,
-            'Alignment': 2,  # Bottom center
-            'MarginV': 30,
+            "FontName": "Arial",
+            "FontSize": 24,
+            "PrimaryColour": "&H00FFFFFF",  # White
+            "OutlineColour": "&H00000000",  # Black outline
+            "BorderStyle": 1,
+            "Outline": 2,
+            "Shadow": 0,
+            "Alignment": 2,  # Bottom center
+            "MarginV": 30,
         }
 
         if subtitle_style:
@@ -148,14 +149,17 @@ class FFmpegProcessor:
         # FFmpeg subtitles filter requires escaping backslashes and colons on Windows
         escaped_path = str(subtitle_path).replace("\\", "/").replace(":", "\\:")
         filter_str = f"subtitles={escaped_path}:force_style='"
-        filter_str += ','.join(f"{k}={v}" for k, v in default_style.items())
+        filter_str += ",".join(f"{k}={v}" for k, v in default_style.items())
         filter_str += "'"
 
         cmd = [
             self.ffmpeg,
-            "-i", str(video_path),
-            "-vf", filter_str,
-            "-c:a", "copy",  # Copy audio without re-encoding
+            "-i",
+            str(video_path),
+            "-vf",
+            filter_str,
+            "-c:a",
+            "copy",  # Copy audio without re-encoding
             "-y",
             str(output_path),
         ]
@@ -189,12 +193,18 @@ class FFmpegProcessor:
         """
         cmd = [
             self.ffmpeg,
-            "-i", str(video_path),
-            "-i", str(subtitle_path),
-            "-c:v", "copy",
-            "-c:a", "copy",
-            "-c:s", "mov_text" if output_path.suffix == ".mp4" else "srt",
-            "-metadata:s:s:0", f"language={language}",
+            "-i",
+            str(video_path),
+            "-i",
+            str(subtitle_path),
+            "-c:v",
+            "copy",
+            "-c:a",
+            "copy",
+            "-c:s",
+            "mov_text" if output_path.suffix == ".mp4" else "srt",
+            "-metadata:s:s:0",
+            f"language={language}",
             "-y",
             str(output_path),
         ]
@@ -229,7 +239,7 @@ class FFmpegProcessor:
 
         # Create concat file
         concat_file = output_path.parent / "concat_list.txt"
-        with open(concat_file, 'w', encoding='utf-8') as f:
+        with open(concat_file, "w", encoding="utf-8") as f:
             for video in video_paths:
                 # FFmpeg concat format
                 f.write(f"file '{video.absolute()}'\n")
@@ -237,10 +247,14 @@ class FFmpegProcessor:
         try:
             cmd = [
                 self.ffmpeg,
-                "-f", "concat",
-                "-safe", "0",
-                "-i", str(concat_file),
-                "-c", "copy",
+                "-f",
+                "concat",
+                "-safe",
+                "0",
+                "-i",
+                str(concat_file),
+                "-c",
+                "copy",
                 "-y",
                 str(output_path),
             ]
@@ -305,9 +319,12 @@ class FFmpegProcessor:
 
         cmd = [
             self.ffmpeg,
-            "-i", str(video_path),
-            "-filter:v", video_filter,
-            "-filter:a", audio_filter,
+            "-i",
+            str(video_path),
+            "-filter:v",
+            video_filter,
+            "-filter:a",
+            audio_filter,
             "-y",
             str(output_path),
         ]
@@ -343,7 +360,8 @@ class FFmpegProcessor:
         """
         cmd = [
             self.ffmpeg,
-            "-i", str(video_path),
+            "-i",
+            str(video_path),
         ]
 
         # Video codec
@@ -393,8 +411,10 @@ class FFmpegProcessor:
         """
         cmd = [
             self.ffmpeg,
-            "-i", str(video_path),
-            "-ss", str(start_time),
+            "-i",
+            str(video_path),
+            "-ss",
+            str(start_time),
         ]
 
         if duration:
@@ -402,11 +422,14 @@ class FFmpegProcessor:
         elif end_time:
             cmd.extend(["-to", str(end_time)])
 
-        cmd.extend([
-            "-c", "copy",
-            "-y",
-            str(output_path),
-        ])
+        cmd.extend(
+            [
+                "-c",
+                "copy",
+                "-y",
+                str(output_path),
+            ]
+        )
 
         try:
             logger.info(f"Extracting segment from {video_path.name}")
@@ -419,6 +442,7 @@ class FFmpegProcessor:
 
 
 # Utility functions
+
 
 def check_ffmpeg_installed(ffmpeg_path: Optional[str] = None) -> bool:
     """Check if FFmpeg is installed and accessible.

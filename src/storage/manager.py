@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CachedVideo:
     """Cached video metadata."""
+
     video_id: str
     source_id: str
     format_id: str  # e.g., "720p", "480p", "360p"
@@ -39,6 +40,7 @@ class CachedVideo:
 @dataclass
 class StorageStats:
     """Storage statistics."""
+
     total_size: int  # bytes
     file_count: int
     oldest_file: Optional[str]
@@ -94,9 +96,7 @@ class StorageManager:
             try:
                 with open(self.cache_index_path, "r") as f:
                     data = json.load(f)
-                    return {
-                        k: CachedVideo(**v) for k, v in data.items()
-                    }
+                    return {k: CachedVideo(**v) for k, v in data.items()}
             except Exception as e:
                 logger.warning(f"Failed to load cache index: {e}")
         return {}
@@ -105,10 +105,7 @@ class StorageManager:
         """Save cache index to disk."""
         try:
             with open(self.cache_index_path, "w") as f:
-                json.dump(
-                    {k: asdict(v) for k, v in self.cache_index.items()},
-                    f, indent=2
-                )
+                json.dump({k: asdict(v) for k, v in self.cache_index.items()}, f, indent=2)
         except Exception as e:
             logger.error(f"Failed to save cache index: {e}")
 
@@ -117,10 +114,7 @@ class StorageManager:
         return f"{source_id}_{video_id}_{format_id}"
 
     def get_cached_video(
-        self,
-        video_id: str,
-        source_id: str,
-        format_id: str = "720p"
+        self, video_id: str, source_id: str, format_id: str = "720p"
     ) -> Optional[CachedVideo]:
         """Get cached video if available.
 
@@ -272,7 +266,9 @@ class StorageManager:
 
         if files_removed > 0:
             self._save_cache_index()
-            logger.info(f"Cleanup: removed {files_removed} files, freed {bytes_freed / (1024**2):.1f}MB")
+            logger.info(
+                f"Cleanup: removed {files_removed} files, freed {bytes_freed / (1024**2):.1f}MB"
+            )
 
         return files_removed, bytes_freed
 
@@ -293,11 +289,7 @@ class StorageManager:
         # Get all files sorted by last access time
         files_by_access = []
         for key, cached in self.cache_index.items():
-            files_by_access.append((
-                datetime.fromisoformat(cached.last_accessed),
-                key,
-                cached
-            ))
+            files_by_access.append((datetime.fromisoformat(cached.last_accessed), key, cached))
 
         files_by_access.sort(key=lambda x: x[0])  # Oldest first
 
@@ -325,7 +317,9 @@ class StorageManager:
 
         if files_removed > 0:
             self._save_cache_index()
-            logger.info(f"Quota cleanup: removed {files_removed} files, freed {bytes_freed / (1024**2):.1f}MB")
+            logger.info(
+                f"Quota cleanup: removed {files_removed} files, freed {bytes_freed / (1024**2):.1f}MB"
+            )
 
         return files_removed, bytes_freed
 

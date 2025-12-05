@@ -12,6 +12,7 @@ from enum import Enum
 
 class UserTier(Enum):
     """User subscription tier."""
+
     FREE = "free"
     BASIC = "basic"
     PREMIUM = "premium"
@@ -20,6 +21,7 @@ class UserTier(Enum):
 @dataclass
 class SourceInfo:
     """Video source information."""
+
     id: str
     name: str
     description: str
@@ -32,6 +34,7 @@ class SourceInfo:
 @dataclass
 class VideoPreview:
     """Video preview information (without downloading)."""
+
     id: str
     title: str
     url: str

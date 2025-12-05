@@ -120,7 +120,9 @@ async def run_maintenance(api_key: str = Depends(verify_api_key)):
     total_files = report["expired_cleanup"]["files"] + report["quota_cleanup"]["files"]
     total_bytes = report["expired_cleanup"]["bytes"] + report["quota_cleanup"]["bytes"]
 
-    logger.info(f"Maintenance completed: {total_files} files removed, {total_bytes / (1024**2):.1f}MB freed")
+    logger.info(
+        f"Maintenance completed: {total_files} files removed, {total_bytes / (1024**2):.1f}MB freed"
+    )
 
     return MaintenanceResponse(
         files_removed=total_files,
@@ -141,15 +143,17 @@ async def get_cache_info(api_key: str = Depends(verify_api_key)):
 
     cache_entries = []
     for key, cached in manager.cache_index.items():
-        cache_entries.append({
-            "video_id": cached.video_id,
-            "source_id": cached.source_id,
-            "format": cached.format_id,
-            "size_mb": cached.file_size / (1024 * 1024),
-            "access_count": cached.access_count,
-            "has_subtitle": cached.has_subtitle,
-            "last_accessed": cached.last_accessed,
-        })
+        cache_entries.append(
+            {
+                "video_id": cached.video_id,
+                "source_id": cached.source_id,
+                "format": cached.format_id,
+                "size_mb": cached.file_size / (1024 * 1024),
+                "access_count": cached.access_count,
+                "has_subtitle": cached.has_subtitle,
+                "last_accessed": cached.last_accessed,
+            }
+        )
 
     return {
         "cached_videos": len(cache_entries),

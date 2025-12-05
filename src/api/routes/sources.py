@@ -71,7 +71,7 @@ async def get_source_info(source_id: str):
 @router.get("/{source_id}/videos", response_model=VideoListResponse)
 async def list_source_videos(
     source_id: str,
-    limit: int = Query(default=10, ge=1, le=50, description="Maximum videos to return")
+    limit: int = Query(default=10, ge=1, le=50, description="Maximum videos to return"),
 ):
     """Get latest videos from a source."""
     source = get_source(source_id)
@@ -93,7 +93,7 @@ async def list_source_videos(
                 source_id=v.source_id,
             )
             for v in videos
-        ]
+        ],
     )
 
 

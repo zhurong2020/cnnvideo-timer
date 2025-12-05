@@ -28,7 +28,9 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_key: Optional[str] = None  # For WordPress authentication
-    cors_origins: list[str] = []  # Comma-separated in .env: CORS_ORIGINS=https://example.com,https://www.example.com
+    cors_origins: list[str] = (
+        []
+    )  # Comma-separated in .env: CORS_ORIGINS=https://example.com,https://www.example.com
 
     # Paths
     data_dir: Path = Path("./data")
@@ -101,7 +103,9 @@ class Settings(BaseSettings):
 
         # Check if API key is set
         if not self.api_key or self.api_key == "your-secret-api-key-here":
-            warnings.append("⚠️  API_KEY not set or using default placeholder. Set a strong API key.")
+            warnings.append(
+                "⚠️  API_KEY not set or using default placeholder. Set a strong API key."
+            )
 
         # Check CORS configuration
         if not self.cors_origins and not self.debug:

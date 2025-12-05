@@ -21,8 +21,9 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SubtitleSegment:
     """A single subtitle segment."""
+
     start: float  # seconds
-    end: float    # seconds
+    end: float  # seconds
     text: str
 
 
@@ -64,8 +65,7 @@ class SubtitleGenerator:
             logger.info("Whisper model loaded successfully")
         except ImportError:
             raise ImportError(
-                "faster-whisper not installed. "
-                "Install with: pip install faster-whisper"
+                "faster-whisper not installed. " "Install with: pip install faster-whisper"
             )
 
     def extract_audio(self, video_path: Path, audio_path: Optional[Path] = None) -> Path:
@@ -83,11 +83,15 @@ class SubtitleGenerator:
 
         cmd = [
             "ffmpeg",
-            "-i", str(video_path),
+            "-i",
+            str(video_path),
             "-vn",  # No video
-            "-acodec", "pcm_s16le",  # PCM 16-bit
-            "-ar", "16000",  # 16kHz sample rate
-            "-ac", "1",  # Mono
+            "-acodec",
+            "pcm_s16le",  # PCM 16-bit
+            "-ar",
+            "16000",  # 16kHz sample rate
+            "-ac",
+            "1",  # Mono
             "-y",  # Overwrite
             str(audio_path),
         ]
@@ -138,14 +142,18 @@ class SubtitleGenerator:
                 **transcribe_options,
             )
 
-            logger.info(f"Detected language: {info.language} (probability: {info.language_probability:.2f})")
+            logger.info(
+                f"Detected language: {info.language} (probability: {info.language_probability:.2f})"
+            )
 
             for i, segment in enumerate(result):
-                segments.append(SubtitleSegment(
-                    start=segment.start,
-                    end=segment.end,
-                    text=segment.text.strip(),
-                ))
+                segments.append(
+                    SubtitleSegment(
+                        start=segment.start,
+                        end=segment.end,
+                        text=segment.text.strip(),
+                    )
+                )
 
                 if progress_callback and i % 10 == 0:
                     progress_callback(i, -1)  # -1 means unknown total
@@ -296,13 +304,13 @@ class SubtitleDownloader:
         import yt_dlp
 
         ydl_opts = {
-            'skip_download': True,
-            'writesubtitles': True,
-            'writeautomaticsub': True,
-            'subtitleslangs': [language],
-            'subtitlesformat': 'srt/vtt/best',
-            'outtmpl': str(output_path.parent / output_path.stem),
-            'quiet': True,
+            "skip_download": True,
+            "writesubtitles": True,
+            "writeautomaticsub": True,
+            "subtitleslangs": [language],
+            "subtitlesformat": "srt/vtt/best",
+            "outtmpl": str(output_path.parent / output_path.stem),
+            "quiet": True,
         }
 
         try:
@@ -310,10 +318,8 @@ class SubtitleDownloader:
                 info = ydl.extract_info(video_url, download=False)
 
                 # Check if subtitles are available
-                has_subs = (
-                    info.get('subtitles') and language in info['subtitles']
-                ) or (
-                    info.get('automatic_captions') and language in info['automatic_captions']
+                has_subs = (info.get("subtitles") and language in info["subtitles"]) or (
+                    info.get("automatic_captions") and language in info["automatic_captions"]
                 )
 
                 if not has_subs:
@@ -324,7 +330,7 @@ class SubtitleDownloader:
                 ydl.download([video_url])
 
                 # Find the downloaded subtitle file
-                for ext in ['srt', 'vtt']:
+                for ext in ["srt", "vtt"]:
                     subtitle_path = output_path.parent / f"{output_path.stem}.{language}.{ext}"
                     if subtitle_path.exists():
                         # Rename to desired output path
@@ -376,9 +382,7 @@ def get_or_generate_subtitle(
         generator = SubtitleGenerator(model_size=model_size, language=language)
         return generator.generate_from_video(video_path)
     except ImportError:
-        logger.warning(
-            "faster-whisper not installed. Install with: pip install faster-whisper"
-        )
+        logger.warning("faster-whisper not installed. Install with: pip install faster-whisper")
         return None
     except Exception as e:
         logger.error(f"Subtitle generation failed: {e}")

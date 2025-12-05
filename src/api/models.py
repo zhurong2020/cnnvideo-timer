@@ -28,6 +28,7 @@ class ProcessingModeEnum(str, Enum):
 
 class VideoFormatEnum(str, Enum):
     """Available video formats/resolutions."""
+
     LOW_360P = "360p"
     MEDIUM_480P = "480p"
     HD_720P = "720p"
@@ -44,37 +45,41 @@ class UserTierEnum(str, Enum):
 # Request Models
 class TaskCreateRequest(BaseModel):
     """Request to create a new download task."""
+
     source_id: str = Field(..., description="Video source ID (e.g., 'cnn10', 'bbc_learning')")
     video_url: str = Field(..., description="Video URL to download")
     processing_mode: ProcessingModeEnum = Field(
-        default=ProcessingModeEnum.WITH_SUBTITLE,
-        description="Video processing mode"
+        default=ProcessingModeEnum.WITH_SUBTITLE, description="Video processing mode"
     )
     video_format: VideoFormatEnum = Field(
         default=VideoFormatEnum.HD_720P,
-        description="Video format/resolution (360p, 480p, 720p, 1080p, audio_only)"
+        description="Video format/resolution (360p, 480p, 720p, 1080p, audio_only)",
     )
 
     model_config = {
         "json_schema_extra": {
-            "examples": [{
-                "source_id": "cnn10",
-                "video_url": "https://www.youtube.com/watch?v=abc123",
-                "processing_mode": "with_subtitle",
-                "video_format": "720p"
-            }]
+            "examples": [
+                {
+                    "source_id": "cnn10",
+                    "video_url": "https://www.youtube.com/watch?v=abc123",
+                    "processing_mode": "with_subtitle",
+                    "video_format": "720p",
+                }
+            ]
         }
     }
 
 
 class VideoPreviewRequest(BaseModel):
     """Request to preview video info."""
+
     url: str = Field(..., description="Video URL to preview")
 
 
 # Response Models
 class SourceResponse(BaseModel):
     """Video source information."""
+
     id: str
     name: str
     description: str
@@ -86,6 +91,7 @@ class SourceResponse(BaseModel):
 
 class VideoPreviewResponse(BaseModel):
     """Video preview information."""
+
     id: str
     title: str
     url: str
@@ -97,6 +103,7 @@ class VideoPreviewResponse(BaseModel):
 
 class TaskResponse(BaseModel):
     """Task information response."""
+
     id: str
     user_id: str
     source_id: str
@@ -115,23 +122,27 @@ class TaskResponse(BaseModel):
 
 class TaskListResponse(BaseModel):
     """List of tasks response."""
+
     tasks: List[TaskResponse]
     total: int
 
 
 class SourceListResponse(BaseModel):
     """List of sources response."""
+
     sources: List[SourceResponse]
 
 
 class VideoListResponse(BaseModel):
     """List of videos from a source."""
+
     source_id: str
     videos: List[VideoPreviewResponse]
 
 
 class HealthResponse(BaseModel):
     """Health check response."""
+
     status: str
     version: str
     pending_tasks: int
@@ -139,12 +150,14 @@ class HealthResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response."""
+
     error: str
     detail: Optional[str] = None
 
 
 class VideoFormatInfo(BaseModel):
     """Video format information."""
+
     id: str
     description: str
     estimated_size_mb_per_min: float
@@ -152,12 +165,14 @@ class VideoFormatInfo(BaseModel):
 
 class VideoFormatsResponse(BaseModel):
     """List of available video formats."""
+
     formats: List[VideoFormatInfo]
     default_format: str
 
 
 class StorageStatsResponse(BaseModel):
     """Storage statistics response."""
+
     total_size_mb: float
     file_count: int
     quota_gb: float
@@ -169,6 +184,7 @@ class StorageStatsResponse(BaseModel):
 
 class MaintenanceResponse(BaseModel):
     """Maintenance operation response."""
+
     files_removed: int
     bytes_freed_mb: float
     storage_before_mb: float

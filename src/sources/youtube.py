@@ -33,7 +33,7 @@ class YouTubeSource(VideoSource):
         self._description = description
         self._min_tier = min_tier
         self._base_url = "https://www.youtube.com"
-        self._video_pattern = re.compile(r'/watch\?v=([a-zA-Z0-9_-]+)')
+        self._video_pattern = re.compile(r"/watch\?v=([a-zA-Z0-9_-]+)")
 
     @property
     def info(self) -> SourceInfo:
@@ -54,9 +54,7 @@ class YouTubeSource(VideoSource):
         try:
             # Method 1: Try scraping the channel page
             response = requests.get(
-                self._channel_url,
-                headers={'User-Agent': 'Mozilla/5.0'},
-                timeout=30
+                self._channel_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=30
             )
             response.raise_for_status()
 
@@ -86,32 +84,36 @@ class YouTubeSource(VideoSource):
         """Get videos using yt-dlp (fallback method)."""
         videos = []
         opts = {
-            'quiet': True,
-            'no_warnings': True,
-            'extract_flat': True,
-            'playlistend': limit,
+            "quiet": True,
+            "no_warnings": True,
+            "extract_flat": True,
+            "playlistend": limit,
         }
 
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 # Try /videos tab
                 url = self._channel_url
-                if not url.endswith('/videos'):
-                    url = url.rstrip('/') + '/videos'
+                if not url.endswith("/videos"):
+                    url = url.rstrip("/") + "/videos"
 
                 result = ydl.extract_info(url, download=False)
 
-                if result and 'entries' in result:
-                    for entry in result['entries'][:limit]:
+                if result and "entries" in result:
+                    for entry in result["entries"][:limit]:
                         if entry:
-                            videos.append(VideoPreview(
-                                id=entry.get('id', ''),
-                                title=entry.get('title', ''),
-                                url=entry.get('url', f"{self._base_url}/watch?v={entry.get('id', '')}"),
-                                thumbnail=entry.get('thumbnail'),
-                                duration=entry.get('duration', 0),
-                                source_id=self._source_id,
-                            ))
+                            videos.append(
+                                VideoPreview(
+                                    id=entry.get("id", ""),
+                                    title=entry.get("title", ""),
+                                    url=entry.get(
+                                        "url", f"{self._base_url}/watch?v={entry.get('id', '')}"
+                                    ),
+                                    thumbnail=entry.get("thumbnail"),
+                                    duration=entry.get("duration", 0),
+                                    source_id=self._source_id,
+                                )
+                            )
         except Exception as e:
             logger.error(f"yt-dlp extraction failed: {e}")
 
@@ -120,9 +122,9 @@ class YouTubeSource(VideoSource):
     async def _get_video_preview(self, video_id: str, url: str) -> Optional[VideoPreview]:
         """Get preview info for a single video."""
         opts = {
-            'quiet': True,
-            'no_warnings': True,
-            'skip_download': True,
+            "quiet": True,
+            "no_warnings": True,
+            "skip_download": True,
         }
 
         try:
@@ -130,11 +132,11 @@ class YouTubeSource(VideoSource):
                 info = ydl.extract_info(url, download=False)
                 return VideoPreview(
                     id=video_id,
-                    title=info.get('title', ''),
+                    title=info.get("title", ""),
                     url=url,
-                    thumbnail=info.get('thumbnail'),
-                    duration=info.get('duration', 0),
-                    upload_date=info.get('upload_date'),
+                    thumbnail=info.get("thumbnail"),
+                    duration=info.get("duration", 0),
+                    upload_date=info.get("upload_date"),
                     source_id=self._source_id,
                 )
         except Exception as e:
@@ -153,6 +155,7 @@ class YouTubeSource(VideoSource):
 
 
 # Pre-configured sources for common channels
+
 
 class CNN10Source(YouTubeSource):
     """CNN10 news source - 10 minute daily news for students."""

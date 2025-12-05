@@ -27,6 +27,7 @@ router = APIRouter(prefix="/api/v1/quota", tags=["quota"])
 # Response Models
 class TierInfo(BaseModel):
     """Tier information."""
+
     id: str
     name: str
     daily_tasks: int
@@ -38,11 +39,13 @@ class TierInfo(BaseModel):
 
 class TiersResponse(BaseModel):
     """Available tiers response."""
+
     tiers: List[TierInfo]
 
 
 class UserQuotaResponse(BaseModel):
     """User quota status response."""
+
     user_id: str
     tier: str
     daily_tasks_used: int
@@ -58,6 +61,7 @@ class UserQuotaResponse(BaseModel):
 
 class QuotaCheckResponse(BaseModel):
     """Quota check result response."""
+
     allowed: bool
     reason: Optional[str] = None
     remaining_today: int
@@ -66,6 +70,7 @@ class QuotaCheckResponse(BaseModel):
 
 class UpgradeTierRequest(BaseModel):
     """Request to upgrade user tier."""
+
     user_id: str
     tier: str
 
@@ -86,15 +91,17 @@ async def get_available_tiers():
     }
 
     for tier, limits in TIER_LIMITS.items():
-        tiers.append(TierInfo(
-            id=tier.value,
-            name=tier.value.capitalize(),
-            daily_tasks=limits.daily_tasks,
-            max_resolution=limits.max_resolution,
-            allowed_modes=limits.allowed_modes,
-            ai_subtitle=limits.ai_subtitle,
-            price_monthly=prices.get(tier.value),
-        ))
+        tiers.append(
+            TierInfo(
+                id=tier.value,
+                name=tier.value.capitalize(),
+                daily_tasks=limits.daily_tasks,
+                max_resolution=limits.max_resolution,
+                allowed_modes=limits.allowed_modes,
+                ai_subtitle=limits.ai_subtitle,
+                price_monthly=prices.get(tier.value),
+            )
+        )
 
     return TiersResponse(tiers=tiers)
 
@@ -180,7 +187,7 @@ async def upgrade_user_tier(
     except ValueError:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid tier: {request.tier}. Valid tiers: {[t.value for t in UserTier]}"
+            detail=f"Invalid tier: {request.tier}. Valid tiers: {[t.value for t in UserTier]}",
         )
 
     manager = get_quota_manager()

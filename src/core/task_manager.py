@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 class TaskStatus(str, Enum):
     """Task status enumeration."""
+
     PENDING = "pending"
     DOWNLOADING = "downloading"
     PROCESSING = "processing"
@@ -34,15 +35,17 @@ class TaskStatus(str, Enum):
 
 class ProcessingMode(str, Enum):
     """Video processing mode for learning."""
-    ORIGINAL = "original"           # Original video only
+
+    ORIGINAL = "original"  # Original video only
     WITH_SUBTITLE = "with_subtitle"  # Original + subtitle
-    REPEAT_TWICE = "repeat_twice"   # Play twice, second time with subtitle
-    SLOW_WITH_SUBTITLE = "slow"     # Slow playback with subtitle
+    REPEAT_TWICE = "repeat_twice"  # Play twice, second time with subtitle
+    SLOW_WITH_SUBTITLE = "slow"  # Slow playback with subtitle
 
 
 @dataclass
 class Task:
     """Task data model."""
+
     id: str
     user_id: str
     source_id: str
@@ -113,7 +116,8 @@ class TaskManager:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
 
         with self._get_connection() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS tasks (
                     id TEXT PRIMARY KEY,
                     user_id TEXT NOT NULL,
@@ -132,15 +136,20 @@ class TaskManager:
                     error_message TEXT,
                     metadata TEXT
                 )
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id)
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)
-            """)
+            """
+            )
 
             conn.commit()
 
@@ -168,7 +177,9 @@ class TaskManager:
             progress=row["progress"],
             created_at=datetime.fromisoformat(row["created_at"]),
             updated_at=datetime.fromisoformat(row["updated_at"]),
-            completed_at=datetime.fromisoformat(row["completed_at"]) if row["completed_at"] else None,
+            completed_at=(
+                datetime.fromisoformat(row["completed_at"]) if row["completed_at"] else None
+            ),
             output_file=row["output_file"],
             subtitle_file=row["subtitle_file"],
             error_message=row["error_message"],
@@ -201,17 +212,27 @@ class TaskManager:
         )
 
         with self._get_connection() as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO tasks (
                     id, user_id, source_id, video_id, video_url, video_title,
                     status, processing_mode, progress, created_at, updated_at
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                task.id, task.user_id, task.source_id, task.video_id,
-                task.video_url, task.video_title, task.status.value,
-                task.processing_mode.value, task.progress,
-                task.created_at.isoformat(), task.updated_at.isoformat()
-            ))
+            """,
+                (
+                    task.id,
+                    task.user_id,
+                    task.source_id,
+                    task.video_id,
+                    task.video_url,
+                    task.video_title,
+                    task.status.value,
+                    task.processing_mode.value,
+                    task.progress,
+                    task.created_at.isoformat(),
+                    task.updated_at.isoformat(),
+                ),
+            )
             conn.commit()
 
         logger.info(f"Created task {task.id} for video {video_id}")
@@ -220,30 +241,24 @@ class TaskManager:
     def get_task(self, task_id: str) -> Optional[Task]:
         """Get a task by ID."""
         with self._get_connection() as conn:
-            cursor = conn.execute(
-                "SELECT * FROM tasks WHERE id = ?",
-                (task_id,)
-            )
+            cursor = conn.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
             row = cursor.fetchone()
             return self._row_to_task(row) if row else None
 
     def get_user_tasks(
-        self,
-        user_id: str,
-        status: Optional[TaskStatus] = None,
-        limit: int = 20
+        self, user_id: str, status: Optional[TaskStatus] = None, limit: int = 20
     ) -> List[Task]:
         """Get tasks for a user."""
         with self._get_connection() as conn:
             if status:
                 cursor = conn.execute(
                     "SELECT * FROM tasks WHERE user_id = ? AND status = ? ORDER BY created_at DESC LIMIT ?",
-                    (user_id, status.value, limit)
+                    (user_id, status.value, limit),
                 )
             else:
                 cursor = conn.execute(
                     "SELECT * FROM tasks WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
-                    (user_id, limit)
+                    (user_id, limit),
                 )
             return [self._row_to_task(row) for row in cursor.fetchall()]
 
@@ -286,10 +301,7 @@ class TaskManager:
         params.append(task_id)
 
         with self._get_connection() as conn:
-            conn.execute(
-                f"UPDATE tasks SET {', '.join(updates)} WHERE id = ?",
-                params
-            )
+            conn.execute(f"UPDATE tasks SET {', '.join(updates)} WHERE id = ?", params)
             conn.commit()
 
         return self.get_task(task_id)
@@ -321,7 +333,7 @@ class TaskManager:
             # Get old completed tasks
             cursor = conn.execute(
                 "SELECT * FROM tasks WHERE status IN (?, ?) AND completed_at < ?",
-                (TaskStatus.COMPLETED.value, TaskStatus.FAILED.value, cutoff.isoformat())
+                (TaskStatus.COMPLETED.value, TaskStatus.FAILED.value, cutoff.isoformat()),
             )
             old_tasks = [self._row_to_task(row) for row in cursor.fetchall()]
 
@@ -335,7 +347,7 @@ class TaskManager:
             # Delete from database
             conn.execute(
                 "DELETE FROM tasks WHERE status IN (?, ?) AND completed_at < ?",
-                (TaskStatus.COMPLETED.value, TaskStatus.FAILED.value, cutoff.isoformat())
+                (TaskStatus.COMPLETED.value, TaskStatus.FAILED.value, cutoff.isoformat()),
             )
             conn.commit()
 
@@ -347,7 +359,11 @@ class TaskManager:
         with self._get_connection() as conn:
             cursor = conn.execute(
                 "SELECT COUNT(*) FROM tasks WHERE status IN (?, ?, ?)",
-                (TaskStatus.PENDING.value, TaskStatus.DOWNLOADING.value, TaskStatus.PROCESSING.value)
+                (
+                    TaskStatus.PENDING.value,
+                    TaskStatus.DOWNLOADING.value,
+                    TaskStatus.PROCESSING.value,
+                ),
             )
             return cursor.fetchone()[0]
 

@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class VideoInfo:
     """Video information container."""
+
     id: str
     title: str
     url: str
@@ -39,6 +40,7 @@ class VideoInfo:
 @dataclass
 class DownloadResult:
     """Download result container."""
+
     success: bool
     video_id: str
     title: str
@@ -64,17 +66,18 @@ class VideoDownloader:
     def _get_ydl_opts(self, format_id: Optional[str] = None) -> Dict[str, Any]:
         """Get yt-dlp options."""
         opts = {
-            'format': format_id or f'best[height<={self.max_resolution}][ext=mp4]/best[height<={self.max_resolution}]',
-            'outtmpl': str(self.output_dir / '%(id)s.%(ext)s'),
-            'quiet': True,
-            'no_progress': True,
-            'no_warnings': True,
-            'extract_flat': False,
+            "format": format_id
+            or f"best[height<={self.max_resolution}][ext=mp4]/best[height<={self.max_resolution}]",
+            "outtmpl": str(self.output_dir / "%(id)s.%(ext)s"),
+            "quiet": True,
+            "no_progress": True,
+            "no_warnings": True,
+            "extract_flat": False,
             # Download subtitles if available
-            'writesubtitles': True,
-            'writeautomaticsub': True,
-            'subtitleslangs': ['en'],
-            'subtitlesformat': 'srt/vtt/best',
+            "writesubtitles": True,
+            "writeautomaticsub": True,
+            "subtitleslangs": ["en"],
+            "subtitlesformat": "srt/vtt/best",
         }
         return opts
 
@@ -88,10 +91,10 @@ class VideoDownloader:
             VideoInfo object or None if failed
         """
         opts = {
-            'quiet': True,
-            'no_warnings': True,
-            'extract_flat': False,
-            'skip_download': True,
+            "quiet": True,
+            "no_warnings": True,
+            "extract_flat": False,
+            "skip_download": True,
         }
 
         try:
@@ -99,16 +102,16 @@ class VideoDownloader:
                 info = ydl.extract_info(url, download=False)
 
                 return VideoInfo(
-                    id=info.get('id', ''),
-                    title=info.get('title', ''),
-                    url=info.get('webpage_url', url),
-                    description=info.get('description', ''),
-                    duration=info.get('duration', 0),
-                    thumbnail=info.get('thumbnail'),
-                    uploader=info.get('uploader'),
-                    upload_date=info.get('upload_date'),
-                    view_count=info.get('view_count', 0),
-                    formats=info.get('formats', []),
+                    id=info.get("id", ""),
+                    title=info.get("title", ""),
+                    url=info.get("webpage_url", url),
+                    description=info.get("description", ""),
+                    duration=info.get("duration", 0),
+                    thumbnail=info.get("thumbnail"),
+                    uploader=info.get("uploader"),
+                    upload_date=info.get("upload_date"),
+                    view_count=info.get("view_count", 0),
+                    formats=info.get("formats", []),
                 )
         except Exception as e:
             logger.error(f"Failed to get video info: {e}")
@@ -128,10 +131,7 @@ class VideoDownloader:
         info = self.get_video_info(url)
         if not info:
             return DownloadResult(
-                success=False,
-                video_id="",
-                title="",
-                error="Failed to get video info"
+                success=False, video_id="", title="", error="Failed to get video info"
             )
 
         opts = self._get_ydl_opts(format_id)
@@ -144,7 +144,7 @@ class VideoDownloader:
             expected_path = self.output_dir / f"{info.id}.mp4"
             if not expected_path.exists():
                 # Try other extensions
-                for ext in ['.webm', '.mkv', '.mp4']:
+                for ext in [".webm", ".mkv", ".mp4"]:
                     alt_path = self.output_dir / f"{info.id}{ext}"
                     if alt_path.exists():
                         expected_path = alt_path
@@ -156,24 +156,19 @@ class VideoDownloader:
                     video_id=info.id,
                     title=info.title,
                     file_path=expected_path,
-                    file_size=expected_path.stat().st_size
+                    file_size=expected_path.stat().st_size,
                 )
             else:
                 return DownloadResult(
                     success=False,
                     video_id=info.id,
                     title=info.title,
-                    error="Downloaded file not found"
+                    error="Downloaded file not found",
                 )
 
         except Exception as e:
             logger.error(f"Download failed: {e}")
-            return DownloadResult(
-                success=False,
-                video_id=info.id,
-                title=info.title,
-                error=str(e)
-            )
+            return DownloadResult(success=False, video_id=info.id, title=info.title, error=str(e))
 
     def get_suitable_formats(self, url: str) -> List[Dict[str, Any]]:
         """Get list of suitable formats for a video.
@@ -189,14 +184,15 @@ class VideoDownloader:
             return []
 
         suitable = [
-            f for f in info.formats
-            if f.get('ext') == 'mp4'
-            and f.get('height')
-            and f['height'] <= self.max_resolution
-            and f.get('vcodec') != 'none'  # Has video
+            f
+            for f in info.formats
+            if f.get("ext") == "mp4"
+            and f.get("height")
+            and f["height"] <= self.max_resolution
+            and f.get("vcodec") != "none"  # Has video
         ]
 
         # Sort by filesize (smallest first)
-        suitable.sort(key=lambda f: f.get('filesize') or float('inf'))
+        suitable.sort(key=lambda f: f.get("filesize") or float("inf"))
 
         return suitable

@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 class LearningMode(str, Enum):
     """Learning mode enum."""
+
     ORIGINAL = "original"
     WITH_SUBTITLE = "with_subtitle"
     REPEAT_TWICE = "repeat_twice"
@@ -35,7 +36,9 @@ class LearningModeProcessor:
         """Initialize learning mode processor."""
         settings = get_settings()
         ffmpeg_path = settings.ffmpeg_path or "ffmpeg"
-        ffprobe_path = ffmpeg_path.replace("ffmpeg", "ffprobe") if settings.ffmpeg_path else "ffprobe"
+        ffprobe_path = (
+            ffmpeg_path.replace("ffmpeg", "ffprobe") if settings.ffmpeg_path else "ffprobe"
+        )
         self.ffmpeg = FFmpegProcessor(ffmpeg_path=ffmpeg_path, ffprobe_path=ffprobe_path)
 
     def process(
@@ -69,20 +72,17 @@ class LearningModeProcessor:
 
         elif mode == LearningMode.WITH_SUBTITLE:
             return self._process_with_subtitle(
-                video_path, output_path, video_url,
-                whisper_model, subtitle_path, progress_callback
+                video_path, output_path, video_url, whisper_model, subtitle_path, progress_callback
             )
 
         elif mode == LearningMode.REPEAT_TWICE:
             return self._process_repeat_twice(
-                video_path, output_path, video_url,
-                whisper_model, subtitle_path, progress_callback
+                video_path, output_path, video_url, whisper_model, subtitle_path, progress_callback
             )
 
         elif mode == LearningMode.SLOW:
             return self._process_slow(
-                video_path, output_path, video_url,
-                whisper_model, subtitle_path, progress_callback
+                video_path, output_path, video_url, whisper_model, subtitle_path, progress_callback
             )
 
         else:
@@ -108,6 +108,7 @@ class LearningModeProcessor:
         if video_path.suffix == output_path.suffix:
             # Just copy
             import shutil
+
             shutil.copy2(video_path, output_path)
         else:
             # Convert format
@@ -159,12 +160,12 @@ class LearningModeProcessor:
             srt_path,
             output_path,
             subtitle_style={
-                'FontSize': 20,
-                'PrimaryColour': '&H00FFFFFF',
-                'OutlineColour': '&H00000000',
-                'Alignment': 2,
-                'MarginV': 30,
-            }
+                "FontSize": 20,
+                "PrimaryColour": "&H00FFFFFF",
+                "OutlineColour": "&H00000000",
+                "Alignment": 2,
+                "MarginV": 30,
+            },
         )
 
     def _process_repeat_twice(
@@ -209,10 +210,7 @@ class LearningModeProcessor:
             # Just repeat original twice
             temp_dir = output_path.parent / "temp"
             temp_dir.mkdir(exist_ok=True)
-            return self.ffmpeg.concatenate_videos(
-                [video_path, video_path],
-                output_path
-            )
+            return self.ffmpeg.concatenate_videos([video_path, video_path], output_path)
 
         # Create temp directory
         temp_dir = output_path.parent / "temp"
@@ -230,19 +228,16 @@ class LearningModeProcessor:
                 srt_path,
                 video2,
                 subtitle_style={
-                    'FontSize': 20,
-                    'PrimaryColour': '&H0000FFFF',  # Yellow for second part
-                    'OutlineColour': '&H00000000',
-                    'Alignment': 2,
-                    'MarginV': 30,
-                }
+                    "FontSize": 20,
+                    "PrimaryColour": "&H0000FFFF",  # Yellow for second part
+                    "OutlineColour": "&H00000000",
+                    "Alignment": 2,
+                    "MarginV": 30,
+                },
             )
 
             # Concatenate
-            result = self.ffmpeg.concatenate_videos(
-                [video1, video2],
-                output_path
-            )
+            result = self.ffmpeg.concatenate_videos([video1, video2], output_path)
 
             return result
 
@@ -250,6 +245,7 @@ class LearningModeProcessor:
             # Cleanup temp files
             if temp_dir.exists():
                 import shutil
+
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
     def _process_slow(
@@ -294,11 +290,7 @@ class LearningModeProcessor:
         try:
             # First, slow down the video
             slow_video = temp_dir / f"{video_path.stem}_slow.mp4"
-            self.ffmpeg.adjust_speed(
-                video_path,
-                slow_video,
-                speed_factor=0.75
-            )
+            self.ffmpeg.adjust_speed(video_path, slow_video, speed_factor=0.75)
 
             # Then add subtitle
             if srt_path:
@@ -307,17 +299,18 @@ class LearningModeProcessor:
                     srt_path,
                     output_path,
                     subtitle_style={
-                        'FontSize': 22,
-                        'PrimaryColour': '&H00FFFFFF',
-                        'OutlineColour': '&H00000000',
-                        'Alignment': 2,
-                        'MarginV': 30,
-                    }
+                        "FontSize": 22,
+                        "PrimaryColour": "&H00FFFFFF",
+                        "OutlineColour": "&H00000000",
+                        "Alignment": 2,
+                        "MarginV": 30,
+                    },
                 )
             else:
                 # No subtitle, just return slow video
                 logger.warning("No subtitle available, using slow video without subtitle")
                 import shutil
+
                 shutil.move(str(slow_video), str(output_path))
                 return output_path
 
@@ -325,6 +318,7 @@ class LearningModeProcessor:
             # Cleanup
             if temp_dir.exists():
                 import shutil
+
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
 

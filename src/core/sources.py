@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class VideoSource:
     """Video source configuration."""
+
     id: str
     name: str
     description: str
@@ -36,6 +37,7 @@ class VideoSource:
 @dataclass
 class SourceCategory:
     """Source category definition."""
+
     id: str
     name: str
     description: str
@@ -45,6 +47,7 @@ class SourceCategory:
 @dataclass
 class DifficultyLevel:
     """Difficulty level definition."""
+
     id: str
     name: str
     description: str
@@ -114,7 +117,9 @@ class SourceConfigManager:
                     )
 
                 self._last_loaded = datetime.now()
-                logger.info(f"Loaded source config: {len(self._sources)} sources, {len(self._categories)} categories")
+                logger.info(
+                    f"Loaded source config: {len(self._sources)} sources, {len(self._categories)} categories"
+                )
 
             except Exception as e:
                 logger.warning(f"Failed to load source config: {e}")
@@ -140,17 +145,23 @@ class SourceConfigManager:
             return {k: v for k, v in self._sources.items() if v.enabled}
         return self._sources.copy()
 
-    def get_sources_by_category(self, category: str, enabled_only: bool = True) -> List[VideoSource]:
+    def get_sources_by_category(
+        self, category: str, enabled_only: bool = True
+    ) -> List[VideoSource]:
         """Get sources in a specific category."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.category == category]
 
-    def get_sources_by_difficulty(self, difficulty: str, enabled_only: bool = True) -> List[VideoSource]:
+    def get_sources_by_difficulty(
+        self, difficulty: str, enabled_only: bool = True
+    ) -> List[VideoSource]:
         """Get sources matching a difficulty level."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.difficulty == difficulty]
 
-    def get_sources_by_language(self, language: str, enabled_only: bool = True) -> List[VideoSource]:
+    def get_sources_by_language(
+        self, language: str, enabled_only: bool = True
+    ) -> List[VideoSource]:
         """Get sources in a specific language."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.language.startswith(language)]
@@ -189,7 +200,8 @@ class SourceConfigManager:
         if query:
             query_lower = query.lower()
             sources = [
-                s for s in sources
+                s
+                for s in sources
                 if query_lower in s.name.lower()
                 or query_lower in s.description.lower()
                 or any(query_lower in tag.lower() for tag in s.tags)
