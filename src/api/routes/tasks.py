@@ -4,7 +4,7 @@ Tasks API routes.
 
 from typing import Optional
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Query, Header, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Query, Header, BackgroundTasks, Depends
 from fastapi.responses import FileResponse
 
 from ..models import (
@@ -21,13 +21,9 @@ from ...core.task_manager import (
 )
 from ...core.downloader import VideoDownloader
 from ...core.config import get_settings
+from ..dependencies import verify_api_key, get_user_id
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
-
-
-def _get_user_id(x_user_id: Optional[str] = Header(default=None)) -> str:
-    """Get user ID from header or use default."""
-    return x_user_id or "anonymous"
 
 
 def _status_to_enum(status: TaskStatus) -> TaskStatusEnum:
@@ -149,10 +145,10 @@ async def process_task_background(task_id: str):
 async def create_task(
     request: TaskCreateRequest,
     background_tasks: BackgroundTasks,
-    x_user_id: Optional[str] = Header(default=None),
+    api_key: str = Depends(verify_api_key),
+    user_id: str = Depends(get_user_id),
 ):
     """Create a new video download/processing task."""
-    user_id = _get_user_id(x_user_id)
     settings = get_settings()
     manager = get_task_manager()
 
@@ -195,10 +191,10 @@ async def create_task(
 async def list_tasks(
     status: Optional[TaskStatusEnum] = Query(default=None, description="Filter by status"),
     limit: int = Query(default=20, ge=1, le=100),
-    x_user_id: Optional[str] = Header(default=None),
+    api_key: str = Depends(verify_api_key),
+    user_id: str = Depends(get_user_id),
 ):
     """Get list of tasks for the current user."""
-    user_id = _get_user_id(x_user_id)
     settings = get_settings()
     manager = get_task_manager()
 
@@ -214,10 +210,10 @@ async def list_tasks(
 @router.get("/{task_id}", response_model=TaskResponse)
 async def get_task(
     task_id: str,
-    x_user_id: Optional[str] = Header(default=None),
+    api_key: str = Depends(verify_api_key),
+    user_id: str = Depends(get_user_id),
 ):
     """Get task details."""
-    user_id = _get_user_id(x_user_id)
     settings = get_settings()
     manager = get_task_manager()
 
@@ -235,10 +231,10 @@ async def get_task(
 @router.get("/{task_id}/download")
 async def download_task_file(
     task_id: str,
-    x_user_id: Optional[str] = Header(default=None),
+    api_key: str = Depends(verify_api_key),
+    user_id: str = Depends(get_user_id),
 ):
     """Download the processed video file."""
-    user_id = _get_user_id(x_user_id)
     manager = get_task_manager()
 
     task = manager.get_task(task_id)
@@ -268,10 +264,10 @@ async def download_task_file(
 @router.delete("/{task_id}")
 async def delete_task(
     task_id: str,
-    x_user_id: Optional[str] = Header(default=None),
+    api_key: str = Depends(verify_api_key),
+    user_id: str = Depends(get_user_id),
 ):
     """Delete a task and its files."""
-    user_id = _get_user_id(x_user_id)
     manager = get_task_manager()
 
     task = manager.get_task(task_id)

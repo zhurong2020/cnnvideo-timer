@@ -3,7 +3,7 @@ Video sources API routes.
 """
 
 from typing import List
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 
 from ..models import (
     SourceResponse,
@@ -15,6 +15,7 @@ from ..models import (
 )
 from ...sources.youtube import get_source, get_all_sources
 from ...sources.base import UserTier
+from ..dependencies import verify_api_key
 
 router = APIRouter(prefix="/sources", tags=["sources"])
 
@@ -97,7 +98,10 @@ async def list_source_videos(
 
 
 @router.post("/preview", response_model=VideoPreviewResponse)
-async def preview_video(request: VideoPreviewRequest):
+async def preview_video(
+    request: VideoPreviewRequest,
+    api_key: str = Depends(verify_api_key),
+):
     """Preview video information without downloading."""
     from ...core.downloader import VideoDownloader
 

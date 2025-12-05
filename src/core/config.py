@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_key: Optional[str] = None  # For WordPress authentication
+    cors_origins: list[str] = []  # Comma-separated in .env: CORS_ORIGINS=https://example.com,https://www.example.com
 
     # Paths
     data_dir: Path = Path("./data")
@@ -78,6 +79,51 @@ class Settings(BaseSettings):
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.temp_dir.mkdir(parents=True, exist_ok=True)
         self.log_dir.mkdir(parents=True, exist_ok=True)
+
+    def validate_production_config(self) -> list[str]:
+        """
+        Validate configuration for production deployment.
+
+        Returns:
+            List of warning messages. Empty list means all checks passed.
+        """
+        warnings = []
+
+        # Check if debug mode is enabled in production
+        if self.debug:
+            warnings.append("⚠️  DEBUG mode is enabled. Disable in production for security.")
+
+        # Check if API key is set
+        if not self.api_key or self.api_key == "your-secret-api-key-here":
+            warnings.append("⚠️  API_KEY not set or using default placeholder. Set a strong API key.")
+
+        # Check CORS configuration
+        if not self.cors_origins and not self.debug:
+            warnings.append(
+                "⚠️  CORS_ORIGINS not configured. Configure allowed origins for production "
+                "(e.g., CORS_ORIGINS=https://yourdomain.com)"
+            )
+
+        # Check Whisper model selection for resource constraints
+        large_models = ["medium", "large"]
+        if self.whisper_model in large_models:
+            warnings.append(
+                f"ℹ️  Using Whisper model '{self.whisper_model}' requires significant RAM. "
+                "Consider 'tiny' or 'base' for low-resource servers."
+            )
+
+        # Check concurrent tasks
+        if self.max_concurrent_tasks > 4:
+            warnings.append(
+                f"⚠️  MAX_CONCURRENT_TASKS={self.max_concurrent_tasks} may be too high. "
+                "Consider reducing to 1-2 for low-resource servers."
+            )
+
+        # Check FFmpeg availability
+        if self.ffmpeg_path and not Path(self.ffmpeg_path).exists():
+            warnings.append(f"❌ FFmpeg path '{self.ffmpeg_path}' does not exist.")
+
+        return warnings
 
 
 @lru_cache

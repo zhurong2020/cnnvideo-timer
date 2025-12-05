@@ -29,6 +29,13 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     settings.ensure_directories()
 
+    # Validate production configuration
+    config_warnings = settings.validate_production_config()
+    if config_warnings:
+        logger.warning("Configuration validation warnings:")
+        for warning in config_warnings:
+            logger.warning(f"  {warning}")
+
     # Initialize task manager
     get_task_manager()
 
@@ -62,13 +69,14 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # CORS middleware
+    # CORS middleware - configure allowed origins from settings
+    allowed_origins = settings.cors_origins if hasattr(settings, 'cors_origins') and settings.cors_origins else []
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # Configure for your WordPress domain
+        allow_origins=allowed_origins,  # Configure in config.env: CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "X-User-Id", "Authorization"],
     )
 
     # Include routers
@@ -91,7 +99,7 @@ def create_app() -> FastAPI:
     async def root():
         """API root - returns basic info."""
         return {
-            "name": "CNN Video Timer API",
+            "name": "SmartNews Learn API",
             "version": settings.app_version,
             "docs": "/docs",
             "health": "/health",
@@ -101,9 +109,16 @@ def create_app() -> FastAPI:
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         logger.error(f"Unhandled exception: {exc}", exc_info=True)
+
+        # Only expose detailed error messages in debug mode
+        if settings.debug:
+            detail = str(exc)
+        else:
+            detail = "An internal error occurred. Please contact support if the issue persists."
+
         return JSONResponse(
             status_code=500,
-            content={"error": "Internal server error", "detail": str(exc)},
+            content={"error": "Internal server error", "detail": detail},
         )
 
     return app
