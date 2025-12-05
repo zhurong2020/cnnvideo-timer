@@ -3,7 +3,6 @@ Pydantic models for API request/response validation.
 """
 
 from datetime import datetime
-from typing import Optional, List, Dict, Any
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -84,9 +83,9 @@ class SourceResponse(BaseModel):
     name: str
     description: str
     url: str
-    icon: Optional[str] = None
+    icon: str | None = None
     min_tier: UserTierEnum
-    tags: List[str] = []
+    tags: list[str] = []
 
 
 class VideoPreviewResponse(BaseModel):
@@ -95,9 +94,9 @@ class VideoPreviewResponse(BaseModel):
     id: str
     title: str
     url: str
-    thumbnail: Optional[str] = None
+    thumbnail: str | None = None
     duration: int = 0
-    upload_date: Optional[str] = None
+    upload_date: str | None = None
     source_id: str = ""
 
 
@@ -115,29 +114,29 @@ class TaskResponse(BaseModel):
     progress: int
     created_at: datetime
     updated_at: datetime
-    completed_at: Optional[datetime] = None
-    download_url: Optional[str] = None
-    error_message: Optional[str] = None
+    completed_at: datetime | None = None
+    download_url: str | None = None
+    error_message: str | None = None
 
 
 class TaskListResponse(BaseModel):
     """List of tasks response."""
 
-    tasks: List[TaskResponse]
+    tasks: list[TaskResponse]
     total: int
 
 
 class SourceListResponse(BaseModel):
     """List of sources response."""
 
-    sources: List[SourceResponse]
+    sources: list[SourceResponse]
 
 
 class VideoListResponse(BaseModel):
     """List of videos from a source."""
 
     source_id: str
-    videos: List[VideoPreviewResponse]
+    videos: list[VideoPreviewResponse]
 
 
 class HealthResponse(BaseModel):
@@ -152,7 +151,7 @@ class ErrorResponse(BaseModel):
     """Error response."""
 
     error: str
-    detail: Optional[str] = None
+    detail: str | None = None
 
 
 class VideoFormatInfo(BaseModel):
@@ -166,7 +165,7 @@ class VideoFormatInfo(BaseModel):
 class VideoFormatsResponse(BaseModel):
     """List of available video formats."""
 
-    formats: List[VideoFormatInfo]
+    formats: list[VideoFormatInfo]
     default_format: str
 
 
@@ -179,7 +178,7 @@ class StorageStatsResponse(BaseModel):
     quota_used_percent: float
     cache_hours: int
     onedrive_enabled: bool
-    onedrive_usage_mb: Optional[float] = None
+    onedrive_usage_mb: float | None = None
 
 
 class MaintenanceResponse(BaseModel):

@@ -5,10 +5,9 @@ Provides a unified interface for downloading videos from various sources.
 """
 
 import logging
-import os
-from pathlib import Path
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 import yt_dlp
 
@@ -26,11 +25,11 @@ class VideoInfo:
     url: str
     description: str = ""
     duration: int = 0  # seconds
-    thumbnail: Optional[str] = None
-    uploader: Optional[str] = None
-    upload_date: Optional[str] = None
+    thumbnail: str | None = None
+    uploader: str | None = None
+    upload_date: str | None = None
     view_count: int = 0
-    formats: List[Dict[str, Any]] = None
+    formats: list[dict[str, Any]] = None
 
     def __post_init__(self):
         if self.formats is None:
@@ -44,15 +43,15 @@ class DownloadResult:
     success: bool
     video_id: str
     title: str
-    file_path: Optional[Path] = None
-    error: Optional[str] = None
+    file_path: Path | None = None
+    error: str | None = None
     file_size: int = 0
 
 
 class VideoDownloader:
     """Video downloader using yt-dlp."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         """Initialize the downloader.
 
         Args:
@@ -63,7 +62,7 @@ class VideoDownloader:
         self.max_resolution = settings.max_resolution
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _get_ydl_opts(self, format_id: Optional[str] = None) -> Dict[str, Any]:
+    def _get_ydl_opts(self, format_id: str | None = None) -> dict[str, Any]:
         """Get yt-dlp options."""
         opts = {
             "format": format_id
@@ -81,7 +80,7 @@ class VideoDownloader:
         }
         return opts
 
-    def get_video_info(self, url: str) -> Optional[VideoInfo]:
+    def get_video_info(self, url: str) -> VideoInfo | None:
         """Get video information without downloading.
 
         Args:
@@ -117,7 +116,7 @@ class VideoDownloader:
             logger.error(f"Failed to get video info: {e}")
             return None
 
-    def download(self, url: str, format_id: Optional[str] = None) -> DownloadResult:
+    def download(self, url: str, format_id: str | None = None) -> DownloadResult:
         """Download a video.
 
         Args:
@@ -170,7 +169,7 @@ class VideoDownloader:
             logger.error(f"Download failed: {e}")
             return DownloadResult(success=False, video_id=info.id, title=info.title, error=str(e))
 
-    def get_suitable_formats(self, url: str) -> List[Dict[str, Any]]:
+    def get_suitable_formats(self, url: str) -> list[dict[str, Any]]:
         """Get list of suitable formats for a video.
 
         Args:

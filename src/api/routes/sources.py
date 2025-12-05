@@ -2,20 +2,19 @@
 Video sources API routes.
 """
 
-from typing import List
-from fastapi import APIRouter, HTTPException, Query, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-from ..models import (
-    SourceResponse,
-    SourceListResponse,
-    VideoListResponse,
-    VideoPreviewResponse,
-    VideoPreviewRequest,
-    UserTierEnum,
-)
-from ...sources.youtube import get_source, get_all_sources
 from ...sources.base import UserTier
+from ...sources.youtube import get_all_sources, get_source
 from ..dependencies import verify_api_key
+from ..models import (
+    SourceListResponse,
+    SourceResponse,
+    UserTierEnum,
+    VideoListResponse,
+    VideoPreviewRequest,
+    VideoPreviewResponse,
+)
 
 router = APIRouter(prefix="/sources", tags=["sources"])
 

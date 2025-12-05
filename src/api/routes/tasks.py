@@ -2,27 +2,27 @@
 Tasks API routes.
 """
 
-from typing import Optional
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Query, Header, BackgroundTasks, Depends
+
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 
-from ..models import (
-    TaskCreateRequest,
-    TaskResponse,
-    TaskListResponse,
-    TaskStatusEnum,
-    ProcessingModeEnum,
-)
-from ...core.task_manager import (
-    get_task_manager,
-    TaskStatus,
-    ProcessingMode,
-)
-from ...core.downloader import VideoDownloader
 from ...core.config import get_settings
-from ..dependencies import verify_api_key, get_user_id
+from ...core.downloader import VideoDownloader
 from ...core.quota import get_quota_manager
+from ...core.task_manager import (
+    ProcessingMode,
+    TaskStatus,
+    get_task_manager,
+)
+from ..dependencies import get_user_id, verify_api_key
+from ..models import (
+    ProcessingModeEnum,
+    TaskCreateRequest,
+    TaskListResponse,
+    TaskResponse,
+    TaskStatusEnum,
+)
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -64,7 +64,8 @@ def _task_to_response(task, settings) -> TaskResponse:
 async def process_task_background(task_id: str):
     """Background task to process video download and processing."""
     import logging
-    from ...processors.learning_modes import LearningModeProcessor, LearningMode
+
+    from ...processors.learning_modes import LearningMode, LearningModeProcessor
 
     logger = logging.getLogger(__name__)
     manager = get_task_manager()
@@ -214,7 +215,7 @@ async def create_task(
 
 @router.get("", response_model=TaskListResponse)
 async def list_tasks(
-    status: Optional[TaskStatusEnum] = Query(default=None, description="Filter by status"),
+    status: TaskStatusEnum | None = Query(default=None, description="Filter by status"),
     limit: int = Query(default=20, ge=1, le=100),
     api_key: str = Depends(verify_api_key),
     user_id: str = Depends(get_user_id),

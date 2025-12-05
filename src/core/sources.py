@@ -6,10 +6,10 @@ Manages video sources from config/sources.json for easy admin customization.
 
 import json
 import logging
-from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class VideoSource:
     name: str
     description: str
     url: str
-    channel_id: Optional[str]
+    channel_id: str | None
     category: str
     language: str
     difficulty: str
@@ -30,8 +30,8 @@ class VideoSource:
     update_frequency: str
     subtitle_available: bool
     enabled: bool
-    tags: List[str]
-    playlists: Optional[Dict[str, str]] = None
+    tags: list[str]
+    playlists: dict[str, str] | None = None
 
 
 @dataclass
@@ -41,7 +41,7 @@ class SourceCategory:
     id: str
     name: str
     description: str
-    recommended_for: List[str]
+    recommended_for: list[str]
 
 
 @dataclass
@@ -56,7 +56,7 @@ class DifficultyLevel:
 class SourceConfigManager:
     """Manages video source configuration from JSON file."""
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Path | None = None):
         """Initialize source config manager.
 
         Args:
@@ -67,17 +67,17 @@ class SourceConfigManager:
         else:
             self.config_path = Path(config_path)
 
-        self._sources: Dict[str, VideoSource] = {}
-        self._categories: Dict[str, SourceCategory] = {}
-        self._difficulty_levels: Dict[str, DifficultyLevel] = {}
-        self._last_loaded: Optional[datetime] = None
+        self._sources: dict[str, VideoSource] = {}
+        self._categories: dict[str, SourceCategory] = {}
+        self._difficulty_levels: dict[str, DifficultyLevel] = {}
+        self._last_loaded: datetime | None = None
         self._load_config()
 
     def _load_config(self) -> None:
         """Load source configuration from JSON file."""
         if self.config_path.exists():
             try:
-                with open(self.config_path, "r", encoding="utf-8") as f:
+                with open(self.config_path, encoding="utf-8") as f:
                     data = json.load(f)
 
                 # Parse sources
@@ -131,11 +131,11 @@ class SourceConfigManager:
         """Reload configuration from file."""
         self._load_config()
 
-    def get_source(self, source_id: str) -> Optional[VideoSource]:
+    def get_source(self, source_id: str) -> VideoSource | None:
         """Get a specific source by ID."""
         return self._sources.get(source_id)
 
-    def get_all_sources(self, enabled_only: bool = True) -> Dict[str, VideoSource]:
+    def get_all_sources(self, enabled_only: bool = True) -> dict[str, VideoSource]:
         """Get all sources.
 
         Args:
@@ -147,21 +147,21 @@ class SourceConfigManager:
 
     def get_sources_by_category(
         self, category: str, enabled_only: bool = True
-    ) -> List[VideoSource]:
+    ) -> list[VideoSource]:
         """Get sources in a specific category."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.category == category]
 
     def get_sources_by_difficulty(
         self, difficulty: str, enabled_only: bool = True
-    ) -> List[VideoSource]:
+    ) -> list[VideoSource]:
         """Get sources matching a difficulty level."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.difficulty == difficulty]
 
     def get_sources_by_language(
         self, language: str, enabled_only: bool = True
-    ) -> List[VideoSource]:
+    ) -> list[VideoSource]:
         """Get sources in a specific language."""
         sources = self.get_all_sources(enabled_only)
         return [s for s in sources.values() if s.language.startswith(language)]
@@ -169,11 +169,11 @@ class SourceConfigManager:
     def search_sources(
         self,
         query: str = "",
-        category: Optional[str] = None,
-        difficulty: Optional[str] = None,
-        language: Optional[str] = None,
+        category: str | None = None,
+        difficulty: str | None = None,
+        language: str | None = None,
         enabled_only: bool = True,
-    ) -> List[VideoSource]:
+    ) -> list[VideoSource]:
         """Search sources with multiple filters.
 
         Args:
@@ -209,11 +209,11 @@ class SourceConfigManager:
 
         return sources
 
-    def get_categories(self) -> Dict[str, SourceCategory]:
+    def get_categories(self) -> dict[str, SourceCategory]:
         """Get all categories."""
         return self._categories.copy()
 
-    def get_difficulty_levels(self) -> Dict[str, DifficultyLevel]:
+    def get_difficulty_levels(self) -> dict[str, DifficultyLevel]:
         """Get all difficulty levels."""
         return self._difficulty_levels.copy()
 
@@ -229,13 +229,13 @@ class SourceConfigManager:
         """
         return self._update_source(source_id, {"enabled": enabled})
 
-    def _update_source(self, source_id: str, updates: Dict[str, Any]) -> bool:
+    def _update_source(self, source_id: str, updates: dict[str, Any]) -> bool:
         """Update a source and save to file."""
         if not self.config_path.exists():
             return False
 
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             if source_id not in data.get("sources", {}):
@@ -255,7 +255,7 @@ class SourceConfigManager:
             logger.error(f"Failed to update source: {e}")
             return False
 
-    def add_source(self, source_id: str, source_data: Dict[str, Any]) -> bool:
+    def add_source(self, source_id: str, source_data: dict[str, Any]) -> bool:
         """Add a new source.
 
         Args:
@@ -269,7 +269,7 @@ class SourceConfigManager:
             return False
 
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             if source_id in data.get("sources", {}):
@@ -315,7 +315,7 @@ class SourceConfigManager:
             return False
 
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             if source_id not in data.get("sources", {}):
@@ -335,7 +335,7 @@ class SourceConfigManager:
             logger.error(f"Failed to remove source: {e}")
             return False
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Export all configuration as dictionary."""
         return {
             "sources": {
@@ -375,7 +375,7 @@ class SourceConfigManager:
 
 
 # Global source config manager instance
-_source_config: Optional[SourceConfigManager] = None
+_source_config: SourceConfigManager | None = None
 
 
 def get_source_config() -> SourceConfigManager:

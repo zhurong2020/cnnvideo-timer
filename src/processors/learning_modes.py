@@ -9,13 +9,13 @@ Implements different video processing modes:
 """
 
 import logging
-from pathlib import Path
-from typing import Optional
 from enum import Enum
+from pathlib import Path
+
+from src.core.config import get_settings
 
 from .ffmpeg import FFmpegProcessor
 from .subtitle import get_or_generate_subtitle
-from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -46,9 +46,9 @@ class LearningModeProcessor:
         video_path: Path,
         output_path: Path,
         mode: LearningMode,
-        video_url: Optional[str] = None,
+        video_url: str | None = None,
         whisper_model: str = "base",
-        subtitle_path: Optional[Path] = None,
+        subtitle_path: Path | None = None,
         progress_callback=None,
     ) -> Path:
         """Process video according to learning mode.
@@ -120,9 +120,9 @@ class LearningModeProcessor:
         self,
         video_path: Path,
         output_path: Path,
-        video_url: Optional[str],
+        video_url: str | None,
         whisper_model: str,
-        subtitle_path: Optional[Path],
+        subtitle_path: Path | None,
         progress_callback,
     ) -> Path:
         """Mode 2: Original video + subtitle (hard-coded).
@@ -172,9 +172,9 @@ class LearningModeProcessor:
         self,
         video_path: Path,
         output_path: Path,
-        video_url: Optional[str],
+        video_url: str | None,
         whisper_model: str,
-        subtitle_path: Optional[Path],
+        subtitle_path: Path | None,
         progress_callback,
     ) -> Path:
         """Mode 3: Play video twice - first without subtitle, second with subtitle.
@@ -252,9 +252,9 @@ class LearningModeProcessor:
         self,
         video_path: Path,
         output_path: Path,
-        video_url: Optional[str],
+        video_url: str | None,
         whisper_model: str,
-        subtitle_path: Optional[Path],
+        subtitle_path: Path | None,
         progress_callback,
     ) -> Path:
         """Mode 4: Slow playback (0.75x speed) with subtitle.
@@ -326,7 +326,7 @@ def process_video_for_learning(
     video_path: Path,
     output_path: Path,
     mode: str = "with_subtitle",
-    video_url: Optional[str] = None,
+    video_url: str | None = None,
     whisper_model: str = "base",
 ) -> Path:
     """Convenience function to process video for learning.

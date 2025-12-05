@@ -10,9 +10,8 @@ Provides functions for:
 
 import logging
 import subprocess
-from pathlib import Path
-from typing import Optional, List, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +115,7 @@ class FFmpegProcessor:
         video_path: Path,
         subtitle_path: Path,
         output_path: Path,
-        subtitle_style: Optional[dict] = None,
+        subtitle_style: dict | None = None,
     ) -> Path:
         """Embed subtitle as hard subtitle (burned into video).
 
@@ -220,9 +219,9 @@ class FFmpegProcessor:
 
     def concatenate_videos(
         self,
-        video_paths: List[Path],
+        video_paths: list[Path],
         output_path: Path,
-        transition: Optional[str] = None,
+        transition: str | None = None,
     ) -> Path:
         """Concatenate multiple videos.
 
@@ -342,9 +341,9 @@ class FFmpegProcessor:
         self,
         video_path: Path,
         output_path: Path,
-        video_codec: Optional[str] = None,
-        audio_codec: Optional[str] = None,
-        quality: Optional[int] = None,
+        video_codec: str | None = None,
+        audio_codec: str | None = None,
+        quality: int | None = None,
     ) -> Path:
         """Convert video to different format.
 
@@ -394,8 +393,8 @@ class FFmpegProcessor:
         video_path: Path,
         output_path: Path,
         start_time: float,
-        duration: Optional[float] = None,
-        end_time: Optional[float] = None,
+        duration: float | None = None,
+        end_time: float | None = None,
     ) -> Path:
         """Extract a segment from video.
 
@@ -444,7 +443,7 @@ class FFmpegProcessor:
 # Utility functions
 
 
-def check_ffmpeg_installed(ffmpeg_path: Optional[str] = None) -> bool:
+def check_ffmpeg_installed(ffmpeg_path: str | None = None) -> bool:
     """Check if FFmpeg is installed and accessible.
 
     Args:

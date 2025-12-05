@@ -1,8 +1,8 @@
 """Video processors module."""
 
-from .subtitle import SubtitleGenerator, SubtitleDownloader, get_or_generate_subtitle
 from .ffmpeg import FFmpegProcessor, check_ffmpeg_installed
 from .learning_modes import LearningMode, LearningModeProcessor, process_video_for_learning
+from .subtitle import SubtitleDownloader, SubtitleGenerator, get_or_generate_subtitle
 
 __all__ = [
     "SubtitleGenerator",

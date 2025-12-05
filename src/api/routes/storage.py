@@ -8,20 +8,20 @@ Provides endpoints for:
 """
 
 import logging
-from fastapi import APIRouter, Depends, HTTPException
 
-from src.core.config import get_settings
+from fastapi import APIRouter, Depends
+
 from src.api.dependencies import verify_api_key
 from src.api.models import (
-    VideoFormatsResponse,
-    VideoFormatInfo,
-    StorageStatsResponse,
     MaintenanceResponse,
+    StorageStatsResponse,
+    VideoFormatInfo,
+    VideoFormatsResponse,
 )
+from src.core.config import get_settings
 from src.storage.manager import (
-    StorageManager,
     VIDEO_FORMATS,
-    get_available_formats,
+    StorageManager,
 )
 
 logger = logging.getLogger(__name__)
@@ -142,7 +142,7 @@ async def get_cache_info(api_key: str = Depends(verify_api_key)):
     manager = get_storage_manager()
 
     cache_entries = []
-    for key, cached in manager.cache_index.items():
+    for _key, cached in manager.cache_index.items():
         cache_entries.append(
             {
                 "video_id": cached.video_id,

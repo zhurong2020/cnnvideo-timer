@@ -6,7 +6,6 @@ All video source adapters should inherit from VideoSource.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Optional
 from enum import Enum
 
 
@@ -26,9 +25,9 @@ class SourceInfo:
     name: str
     description: str
     url: str
-    icon: Optional[str] = None
+    icon: str | None = None
     min_tier: UserTier = UserTier.FREE
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -38,9 +37,9 @@ class VideoPreview:
     id: str
     title: str
     url: str
-    thumbnail: Optional[str] = None
+    thumbnail: str | None = None
     duration: int = 0  # seconds
-    upload_date: Optional[str] = None
+    upload_date: str | None = None
     source_id: str = ""
 
 
@@ -54,7 +53,7 @@ class VideoSource(ABC):
         pass
 
     @abstractmethod
-    async def get_latest_videos(self, limit: int = 10) -> List[VideoPreview]:
+    async def get_latest_videos(self, limit: int = 10) -> list[VideoPreview]:
         """Get latest videos from the source.
 
         Args:
@@ -66,7 +65,7 @@ class VideoSource(ABC):
         pass
 
     @abstractmethod
-    async def get_video_url(self, video_id: str) -> Optional[str]:
+    async def get_video_url(self, video_id: str) -> str | None:
         """Get the full URL for a video.
 
         Args:
@@ -77,7 +76,7 @@ class VideoSource(ABC):
         """
         pass
 
-    async def search_videos(self, query: str, limit: int = 10) -> List[VideoPreview]:
+    async def search_videos(self, query: str, limit: int = 10) -> list[VideoPreview]:
         """Search for videos (optional, not all sources support this).
 
         Args:

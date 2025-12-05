@@ -6,7 +6,7 @@ Provides type-safe configuration with validation and environment variable suppor
 
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # API settings
     api_host: str = "0.0.0.0"
     api_port: int = 8000
-    api_key: Optional[str] = None  # For WordPress authentication
+    api_key: str | None = None  # For WordPress authentication
     cors_origins: list[str] = (
         []
     )  # Comma-separated in .env: CORS_ORIGINS=https://example.com,https://www.example.com
@@ -58,7 +58,7 @@ class Settings(BaseSettings):
     whisper_language: str = "en"
 
     # FFmpeg settings
-    ffmpeg_path: Optional[str] = None  # Auto-detect if None
+    ffmpeg_path: str | None = None  # Auto-detect if None
 
     # Task settings
     max_concurrent_tasks: int = 2
@@ -70,17 +70,17 @@ class Settings(BaseSettings):
     default_video_format: str = "720p"  # Default video format
 
     # OneDrive (rclone) settings
-    rclone_remote: Optional[str] = None  # e.g., "onedrive:videos"
+    rclone_remote: str | None = None  # e.g., "onedrive:videos"
     enable_onedrive: bool = False
     onedrive_quota_gb: float = 10.0  # Limit OneDrive usage
 
     # SMTP settings (for notifications)
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 587
-    smtp_username: Optional[str] = None
-    smtp_password: Optional[str] = None
-    smtp_sender: Optional[str] = None
-    smtp_receiver: Optional[str] = None
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_sender: str | None = None
+    smtp_receiver: str | None = None
 
     def ensure_directories(self) -> None:
         """Create necessary directories if they don't exist."""

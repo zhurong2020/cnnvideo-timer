@@ -8,17 +8,16 @@ Provides endpoints for:
 """
 
 import logging
-from fastapi import APIRouter, Depends, HTTPException, Header
-from typing import Optional, List
 
-from src.core.quota import (
-    get_quota_manager,
-    QuotaManager,
-    UserTier,
-    TIER_LIMITS,
-)
-from src.api.dependencies import verify_api_key, get_user_id
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+
+from src.api.dependencies import get_user_id, verify_api_key
+from src.core.quota import (
+    TIER_LIMITS,
+    UserTier,
+    get_quota_manager,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/quota", tags=["quota"])
@@ -32,15 +31,15 @@ class TierInfo(BaseModel):
     name: str
     daily_tasks: int
     max_resolution: str
-    allowed_modes: List[str]
+    allowed_modes: list[str]
     ai_subtitle: bool
-    price_monthly: Optional[str] = None
+    price_monthly: str | None = None
 
 
 class TiersResponse(BaseModel):
     """Available tiers response."""
 
-    tiers: List[TierInfo]
+    tiers: list[TierInfo]
 
 
 class UserQuotaResponse(BaseModel):
@@ -54,7 +53,7 @@ class UserQuotaResponse(BaseModel):
     total_tasks: int
     total_data_processed_mb: float
     max_resolution: str
-    allowed_modes: List[str]
+    allowed_modes: list[str]
     ai_subtitle_enabled: bool
     member_since: str
 
@@ -63,7 +62,7 @@ class QuotaCheckResponse(BaseModel):
     """Quota check result response."""
 
     allowed: bool
-    reason: Optional[str] = None
+    reason: str | None = None
     remaining_today: int
     tier: str
 

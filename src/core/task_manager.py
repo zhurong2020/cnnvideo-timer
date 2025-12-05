@@ -5,17 +5,17 @@ Handles task creation, status tracking, and background processing.
 """
 
 import asyncio
+import json
 import logging
 import sqlite3
+import threading
 import uuid
+from contextlib import contextmanager
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Optional, List, Dict, Any
-from dataclasses import dataclass, asdict
-from contextlib import contextmanager
-import threading
-import json
+from typing import Any
 
 from .config import get_settings
 
@@ -57,13 +57,13 @@ class Task:
     progress: int  # 0-100
     created_at: datetime
     updated_at: datetime
-    completed_at: Optional[datetime] = None
-    output_file: Optional[str] = None
-    subtitle_file: Optional[str] = None
-    error_message: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    completed_at: datetime | None = None
+    output_file: str | None = None
+    subtitle_file: str | None = None
+    error_message: str | None = None
+    metadata: dict[str, Any] | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "id": self.id,
@@ -107,7 +107,7 @@ class TaskManager:
         self.settings = get_settings()
         self.db_path = self.settings.data_dir / "tasks.db"
         self._init_database()
-        self._processing_tasks: Dict[str, asyncio.Task] = {}
+        self._processing_tasks: dict[str, asyncio.Task] = {}
         self._semaphore = asyncio.Semaphore(self.settings.max_concurrent_tasks)
         self._initialized = True
 
@@ -238,7 +238,7 @@ class TaskManager:
         logger.info(f"Created task {task.id} for video {video_id}")
         return task
 
-    def get_task(self, task_id: str) -> Optional[Task]:
+    def get_task(self, task_id: str) -> Task | None:
         """Get a task by ID."""
         with self._get_connection() as conn:
             cursor = conn.execute("SELECT * FROM tasks WHERE id = ?", (task_id,))
@@ -246,8 +246,8 @@ class TaskManager:
             return self._row_to_task(row) if row else None
 
     def get_user_tasks(
-        self, user_id: str, status: Optional[TaskStatus] = None, limit: int = 20
-    ) -> List[Task]:
+        self, user_id: str, status: TaskStatus | None = None, limit: int = 20
+    ) -> list[Task]:
         """Get tasks for a user."""
         with self._get_connection() as conn:
             if status:
@@ -265,12 +265,12 @@ class TaskManager:
     def update_task(
         self,
         task_id: str,
-        status: Optional[TaskStatus] = None,
-        progress: Optional[int] = None,
-        output_file: Optional[str] = None,
-        subtitle_file: Optional[str] = None,
-        error_message: Optional[str] = None,
-    ) -> Optional[Task]:
+        status: TaskStatus | None = None,
+        progress: int | None = None,
+        output_file: str | None = None,
+        subtitle_file: str | None = None,
+        error_message: str | None = None,
+    ) -> Task | None:
         """Update a task."""
         updates = ["updated_at = ?"]
         params = [datetime.now().isoformat()]

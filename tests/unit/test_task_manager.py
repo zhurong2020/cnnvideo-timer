@@ -2,9 +2,8 @@
 Unit tests for task manager module.
 """
 
+
 import pytest
-from datetime import datetime
-from pathlib import Path
 
 
 class TestTaskManager:

@@ -2,9 +2,6 @@
 Unit tests for configuration module.
 """
 
-import os
-import pytest
-from pathlib import Path
 
 
 class TestSettings:

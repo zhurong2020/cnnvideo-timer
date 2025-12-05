@@ -4,14 +4,13 @@ YouTube video source adapters.
 Provides adapters for YouTube channels including CNN10, BBC Learning English, VOA, etc.
 """
 
-import re
 import logging
-from typing import List, Optional
+import re
 
 import requests
 import yt_dlp
 
-from .base import VideoSource, SourceInfo, VideoPreview, UserTier
+from .base import SourceInfo, UserTier, VideoPreview, VideoSource
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +46,7 @@ class YouTubeSource(VideoSource):
             tags=["youtube", "news", "english"],
         )
 
-    async def get_latest_videos(self, limit: int = 10) -> List[VideoPreview]:
+    async def get_latest_videos(self, limit: int = 10) -> list[VideoPreview]:
         """Get latest videos from the YouTube channel."""
         videos = []
 
@@ -80,7 +79,7 @@ class YouTubeSource(VideoSource):
 
         return videos
 
-    async def _get_videos_via_ytdlp(self, limit: int) -> List[VideoPreview]:
+    async def _get_videos_via_ytdlp(self, limit: int) -> list[VideoPreview]:
         """Get videos using yt-dlp (fallback method)."""
         videos = []
         opts = {
@@ -119,7 +118,7 @@ class YouTubeSource(VideoSource):
 
         return videos
 
-    async def _get_video_preview(self, video_id: str, url: str) -> Optional[VideoPreview]:
+    async def _get_video_preview(self, video_id: str, url: str) -> VideoPreview | None:
         """Get preview info for a single video."""
         opts = {
             "quiet": True,
@@ -149,7 +148,7 @@ class YouTubeSource(VideoSource):
                 source_id=self._source_id,
             )
 
-    async def get_video_url(self, video_id: str) -> Optional[str]:
+    async def get_video_url(self, video_id: str) -> str | None:
         """Get the full URL for a video."""
         return f"{self._base_url}/watch?v={video_id}"
 
@@ -204,7 +203,7 @@ YOUTUBE_SOURCES = {
 }
 
 
-def get_source(source_id: str) -> Optional[VideoSource]:
+def get_source(source_id: str) -> VideoSource | None:
     """Get a video source by ID."""
     source_class = YOUTUBE_SOURCES.get(source_id)
     if source_class:
@@ -212,6 +211,6 @@ def get_source(source_id: str) -> Optional[VideoSource]:
     return None
 
 
-def get_all_sources() -> List[VideoSource]:
+def get_all_sources() -> list[VideoSource]:
     """Get all available video sources."""
     return [cls() for cls in YOUTUBE_SOURCES.values()]

@@ -2,7 +2,6 @@
 Integration tests for API authentication.
 """
 
-import pytest
 
 
 class TestAPIAuthentication:

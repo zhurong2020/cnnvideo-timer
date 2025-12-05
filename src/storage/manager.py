@@ -8,15 +8,12 @@ Features:
 - Storage quota management
 """
 
-import os
+import json
 import logging
 import subprocess
-import hashlib
-import json
-from pathlib import Path
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
-from typing import Optional, Dict, List, Tuple
-from dataclasses import dataclass, asdict
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +31,7 @@ class CachedVideo:
     last_accessed: str
     access_count: int
     has_subtitle: bool
-    subtitle_path: Optional[str] = None
+    subtitle_path: str | None = None
 
 
 @dataclass
@@ -43,8 +40,8 @@ class StorageStats:
 
     total_size: int  # bytes
     file_count: int
-    oldest_file: Optional[str]
-    newest_file: Optional[str]
+    oldest_file: str | None
+    newest_file: str | None
     quota_used_percent: float
 
 
@@ -54,7 +51,7 @@ class StorageManager:
     def __init__(
         self,
         local_path: Path,
-        onedrive_path: Optional[str] = None,
+        onedrive_path: str | None = None,
         quota_bytes: int = 10 * 1024 * 1024 * 1024,  # 10GB default
         cache_hours: int = 24,
         enable_onedrive: bool = False,
@@ -83,18 +80,18 @@ class StorageManager:
 
         # Cache index file
         self.cache_index_path = self.local_path / "cache_index.json"
-        self.cache_index: Dict[str, CachedVideo] = self._load_cache_index()
+        self.cache_index: dict[str, CachedVideo] = self._load_cache_index()
 
         logger.info(f"Storage manager initialized: {local_path}")
         logger.info(f"Quota: {quota_bytes / (1024**3):.1f}GB, Cache hours: {cache_hours}")
         if enable_onedrive:
             logger.info(f"OneDrive enabled: {onedrive_path}")
 
-    def _load_cache_index(self) -> Dict[str, CachedVideo]:
+    def _load_cache_index(self) -> dict[str, CachedVideo]:
         """Load cache index from disk."""
         if self.cache_index_path.exists():
             try:
-                with open(self.cache_index_path, "r") as f:
+                with open(self.cache_index_path) as f:
                     data = json.load(f)
                     return {k: CachedVideo(**v) for k, v in data.items()}
             except Exception as e:
@@ -115,7 +112,7 @@ class StorageManager:
 
     def get_cached_video(
         self, video_id: str, source_id: str, format_id: str = "720p"
-    ) -> Optional[CachedVideo]:
+    ) -> CachedVideo | None:
         """Get cached video if available.
 
         Args:
@@ -153,7 +150,7 @@ class StorageManager:
         format_id: str,
         file_path: Path,
         has_subtitle: bool = False,
-        subtitle_path: Optional[Path] = None,
+        subtitle_path: Path | None = None,
     ) -> CachedVideo:
         """Add video to cache.
 
@@ -221,7 +218,7 @@ class StorageManager:
             quota_used_percent=(total_size / self.quota_bytes * 100) if self.quota_bytes > 0 else 0,
         )
 
-    def cleanup_expired(self) -> Tuple[int, int]:
+    def cleanup_expired(self) -> tuple[int, int]:
         """Remove expired cache files.
 
         Returns:
@@ -272,7 +269,7 @@ class StorageManager:
 
         return files_removed, bytes_freed
 
-    def cleanup_to_quota(self) -> Tuple[int, int]:
+    def cleanup_to_quota(self) -> tuple[int, int]:
         """Remove oldest files until under quota.
 
         Returns:
@@ -323,7 +320,7 @@ class StorageManager:
 
         return files_removed, bytes_freed
 
-    def sync_to_onedrive(self, file_path: Path) -> Optional[str]:
+    def sync_to_onedrive(self, file_path: Path) -> str | None:
         """Sync file to OneDrive using rclone.
 
         Args:
@@ -359,7 +356,7 @@ class StorageManager:
             logger.error(f"OneDrive sync error: {e}")
             return None
 
-    def get_onedrive_usage(self) -> Optional[int]:
+    def get_onedrive_usage(self) -> int | None:
         """Get OneDrive storage usage via rclone.
 
         Returns:
@@ -381,7 +378,7 @@ class StorageManager:
             logger.error(f"Failed to get OneDrive usage: {e}")
             return None
 
-    def run_maintenance(self) -> Dict:
+    def run_maintenance(self) -> dict:
         """Run full maintenance cycle.
 
         Returns:
@@ -441,7 +438,7 @@ VIDEO_FORMATS = {
 }
 
 
-def get_available_formats() -> List[Dict]:
+def get_available_formats() -> list[dict]:
     """Get list of available video formats for API."""
     return [
         {

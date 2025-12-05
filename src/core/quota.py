@@ -8,11 +8,11 @@ Tier configuration is loaded from config/tiers.json for easy admin customization
 
 import json
 import logging
-from pathlib import Path
-from datetime import datetime, date
-from typing import Optional, Dict, List, Any
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass
+from datetime import date, datetime
 from enum import Enum
+from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class TierLimits:
 
     daily_tasks: int  # Max tasks per day (-1 = unlimited)
     max_resolution: str  # Max allowed resolution
-    allowed_modes: List[str]  # Allowed processing modes
+    allowed_modes: list[str]  # Allowed processing modes
     priority: int  # Queue priority (higher = faster)
     ai_subtitle: bool  # Can use Whisper AI subtitle generation
     concurrent_tasks: int  # Max concurrent tasks
@@ -43,7 +43,7 @@ class TierLimits:
 
 
 # Default tier configuration (fallback if config file not found)
-DEFAULT_TIER_LIMITS: Dict[str, TierLimits] = {
+DEFAULT_TIER_LIMITS: dict[str, TierLimits] = {
     "free": TierLimits(
         daily_tasks=3,
         max_resolution="480p",
@@ -86,7 +86,7 @@ DEFAULT_TIER_LIMITS: Dict[str, TierLimits] = {
 class TierConfigManager:
     """Manages tier configuration from JSON file."""
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Path | None = None):
         """Initialize tier config manager.
 
         Args:
@@ -98,17 +98,17 @@ class TierConfigManager:
         else:
             self.config_path = Path(config_path)
 
-        self._tier_limits: Dict[str, TierLimits] = {}
-        self._processing_modes: Dict[str, Dict] = {}
-        self._resolutions: List[str] = []
-        self._last_loaded: Optional[datetime] = None
+        self._tier_limits: dict[str, TierLimits] = {}
+        self._processing_modes: dict[str, dict] = {}
+        self._resolutions: list[str] = []
+        self._last_loaded: datetime | None = None
         self._load_config()
 
     def _load_config(self) -> None:
         """Load tier configuration from JSON file."""
         if self.config_path.exists():
             try:
-                with open(self.config_path, "r", encoding="utf-8") as f:
+                with open(self.config_path, encoding="utf-8") as f:
                     data = json.load(f)
 
                 # Parse tiers
@@ -151,23 +151,23 @@ class TierConfigManager:
             tier, self._tier_limits.get("free", DEFAULT_TIER_LIMITS["free"])
         )
 
-    def get_all_tiers(self) -> Dict[str, TierLimits]:
+    def get_all_tiers(self) -> dict[str, TierLimits]:
         """Get all tier configurations."""
         return self._tier_limits.copy()
 
-    def get_tier_ids(self) -> List[str]:
+    def get_tier_ids(self) -> list[str]:
         """Get list of available tier IDs."""
         return list(self._tier_limits.keys())
 
-    def get_processing_modes(self) -> Dict[str, Dict]:
+    def get_processing_modes(self) -> dict[str, dict]:
         """Get processing mode definitions."""
         return self._processing_modes.copy()
 
-    def get_resolutions(self) -> List[str]:
+    def get_resolutions(self) -> list[str]:
         """Get available resolutions."""
         return self._resolutions.copy()
 
-    def update_tier(self, tier_id: str, updates: Dict[str, Any]) -> bool:
+    def update_tier(self, tier_id: str, updates: dict[str, Any]) -> bool:
         """Update a tier configuration and save to file.
 
         Args:
@@ -181,7 +181,7 @@ class TierConfigManager:
             return False
 
         try:
-            with open(self.config_path, "r", encoding="utf-8") as f:
+            with open(self.config_path, encoding="utf-8") as f:
                 data = json.load(f)
 
             if tier_id not in data.get("tiers", {}):
@@ -205,7 +205,7 @@ class TierConfigManager:
 
 
 # Global tier config manager instance
-_tier_config: Optional[TierConfigManager] = None
+_tier_config: TierConfigManager | None = None
 
 
 def get_tier_config() -> TierConfigManager:
@@ -217,7 +217,7 @@ def get_tier_config() -> TierConfigManager:
 
 
 # Legacy TIER_LIMITS for backward compatibility
-TIER_LIMITS: Dict[UserTier, TierLimits] = {
+TIER_LIMITS: dict[UserTier, TierLimits] = {
     UserTier.FREE: DEFAULT_TIER_LIMITS["free"],
     UserTier.BASIC: DEFAULT_TIER_LIMITS["basic"],
     UserTier.PREMIUM: DEFAULT_TIER_LIMITS["premium"],
@@ -249,10 +249,10 @@ class QuotaCheckResult:
     """Result of quota check."""
 
     allowed: bool
-    reason: Optional[str] = None
+    reason: str | None = None
     remaining_today: int = 0
     tier: str = "free"
-    limits: Optional[Dict] = None
+    limits: dict | None = None
 
 
 class QuotaManager:
@@ -267,14 +267,14 @@ class QuotaManager:
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.usage_file = self.data_dir / "user_usage.json"
-        self.users: Dict[str, UserUsage] = self._load_usage()
+        self.users: dict[str, UserUsage] = self._load_usage()
         logger.info(f"Quota manager initialized with {len(self.users)} users")
 
-    def _load_usage(self) -> Dict[str, UserUsage]:
+    def _load_usage(self) -> dict[str, UserUsage]:
         """Load user usage from disk."""
         if self.usage_file.exists():
             try:
-                with open(self.usage_file, "r") as f:
+                with open(self.usage_file) as f:
                     data = json.load(f)
                     return {k: UserUsage(**v) for k, v in data.items()}
             except Exception as e:
@@ -430,7 +430,7 @@ class QuotaManager:
 
         return user
 
-    def get_user_stats(self, user_id: str) -> Dict:
+    def get_user_stats(self, user_id: str) -> dict:
         """Get user statistics.
 
         Args:
@@ -467,13 +467,13 @@ class QuotaManager:
             "member_since": user.created_at,
         }
 
-    def get_all_users_stats(self) -> List[Dict]:
+    def get_all_users_stats(self) -> list[dict]:
         """Get statistics for all users (admin function)."""
-        return [self.get_user_stats(user_id) for user_id in self.users.keys()]
+        return [self.get_user_stats(user_id) for user_id in self.users]
 
 
 # Global instance
-_quota_manager: Optional[QuotaManager] = None
+_quota_manager: QuotaManager | None = None
 
 
 def get_quota_manager() -> QuotaManager:

@@ -8,13 +8,13 @@ Provides endpoints for:
 """
 
 import logging
-from typing import Optional, List, Dict, Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from src.core.quota import get_tier_config, get_quota_manager, TierLimits
-from src.core.sources import get_source_config, VideoSource
 from src.api.dependencies import verify_api_key
+from src.core.quota import get_tier_config
+from src.core.sources import get_source_config
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
@@ -28,18 +28,18 @@ router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 class TierUpdateRequest(BaseModel):
     """Request to update tier configuration."""
 
-    daily_tasks: Optional[int] = Field(None, description="Max tasks per day (-1 for unlimited)")
-    max_resolution: Optional[str] = Field(
+    daily_tasks: int | None = Field(None, description="Max tasks per day (-1 for unlimited)")
+    max_resolution: str | None = Field(
         None, description="Max resolution (360p, 480p, 720p, 1080p)"
     )
-    allowed_modes: Optional[List[str]] = Field(None, description="Allowed processing modes")
-    priority: Optional[int] = Field(None, description="Queue priority")
-    ai_subtitle: Optional[bool] = Field(None, description="Allow AI subtitle generation")
-    concurrent_tasks: Optional[int] = Field(None, description="Max concurrent tasks")
-    name: Optional[str] = Field(None, description="Display name")
-    description: Optional[str] = Field(None, description="Description")
-    price_monthly: Optional[str] = Field(None, description="Monthly price")
-    price_yearly: Optional[str] = Field(None, description="Yearly price")
+    allowed_modes: list[str] | None = Field(None, description="Allowed processing modes")
+    priority: int | None = Field(None, description="Queue priority")
+    ai_subtitle: bool | None = Field(None, description="Allow AI subtitle generation")
+    concurrent_tasks: int | None = Field(None, description="Max concurrent tasks")
+    name: str | None = Field(None, description="Display name")
+    description: str | None = Field(None, description="Description")
+    price_monthly: str | None = Field(None, description="Monthly price")
+    price_yearly: str | None = Field(None, description="Yearly price")
 
 
 class TierResponse(BaseModel):
@@ -50,7 +50,7 @@ class TierResponse(BaseModel):
     description: str
     daily_tasks: int
     max_resolution: str
-    allowed_modes: List[str]
+    allowed_modes: list[str]
     priority: int
     ai_subtitle: bool
     concurrent_tasks: int
@@ -61,9 +61,9 @@ class TierResponse(BaseModel):
 class TiersConfigResponse(BaseModel):
     """All tiers configuration response."""
 
-    tiers: List[TierResponse]
-    processing_modes: Dict[str, Dict]
-    resolutions: List[str]
+    tiers: list[TierResponse]
+    processing_modes: dict[str, dict]
+    resolutions: list[str]
 
 
 class SourceResponse(BaseModel):
@@ -73,7 +73,7 @@ class SourceResponse(BaseModel):
     name: str
     description: str
     url: str
-    channel_id: Optional[str]
+    channel_id: str | None
     category: str
     language: str
     difficulty: str
@@ -81,16 +81,16 @@ class SourceResponse(BaseModel):
     update_frequency: str
     subtitle_available: bool
     enabled: bool
-    tags: List[str]
-    playlists: Optional[Dict[str, str]] = None
+    tags: list[str]
+    playlists: dict[str, str] | None = None
 
 
 class SourcesConfigResponse(BaseModel):
     """All sources configuration response."""
 
-    sources: List[SourceResponse]
-    categories: Dict[str, Dict]
-    difficulty_levels: Dict[str, Dict]
+    sources: list[SourceResponse]
+    categories: dict[str, dict]
+    difficulty_levels: dict[str, dict]
     total_enabled: int
     total_disabled: int
 
@@ -101,7 +101,7 @@ class SourceCreateRequest(BaseModel):
     name: str = Field(..., description="Source display name")
     description: str = Field(..., description="Source description")
     url: str = Field(..., description="YouTube channel URL")
-    channel_id: Optional[str] = Field(None, description="YouTube channel ID")
+    channel_id: str | None = Field(None, description="YouTube channel ID")
     category: str = Field("general", description="Category ID")
     language: str = Field("en", description="Language code")
     difficulty: str = Field("intermediate", description="Difficulty level")
@@ -109,24 +109,24 @@ class SourceCreateRequest(BaseModel):
     update_frequency: str = Field("varies", description="Content update frequency")
     subtitle_available: bool = Field(True, description="Has subtitles")
     enabled: bool = Field(True, description="Is enabled")
-    tags: List[str] = Field(default_factory=list, description="Search tags")
+    tags: list[str] = Field(default_factory=list, description="Search tags")
 
 
 class SourceUpdateRequest(BaseModel):
     """Request to update a source."""
 
-    name: Optional[str] = None
-    description: Optional[str] = None
-    url: Optional[str] = None
-    channel_id: Optional[str] = None
-    category: Optional[str] = None
-    language: Optional[str] = None
-    difficulty: Optional[str] = None
-    typical_duration: Optional[str] = None
-    update_frequency: Optional[str] = None
-    subtitle_available: Optional[bool] = None
-    enabled: Optional[bool] = None
-    tags: Optional[List[str]] = None
+    name: str | None = None
+    description: str | None = None
+    url: str | None = None
+    channel_id: str | None = None
+    category: str | None = None
+    language: str | None = None
+    difficulty: str | None = None
+    typical_duration: str | None = None
+    update_frequency: str | None = None
+    subtitle_available: bool | None = None
+    enabled: bool | None = None
+    tags: list[str] | None = None
 
 
 # ============================================
@@ -236,9 +236,9 @@ async def reload_tiers_config(
 
 @router.get("/sources", response_model=SourcesConfigResponse)
 async def get_sources_config(
-    category: Optional[str] = Query(None, description="Filter by category"),
-    difficulty: Optional[str] = Query(None, description="Filter by difficulty"),
-    language: Optional[str] = Query(None, description="Filter by language"),
+    category: str | None = Query(None, description="Filter by category"),
+    difficulty: str | None = Query(None, description="Filter by difficulty"),
+    language: str | None = Query(None, description="Filter by language"),
     enabled_only: bool = Query(False, description="Only show enabled sources"),
     api_key: str = Depends(verify_api_key),
 ):

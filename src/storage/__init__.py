@@ -1,10 +1,10 @@
 """Storage management module."""
 
 from .manager import (
-    StorageManager,
-    CachedVideo,
-    StorageStats,
     VIDEO_FORMATS,
+    CachedVideo,
+    StorageManager,
+    StorageStats,
     get_available_formats,
     get_format_string,
 )

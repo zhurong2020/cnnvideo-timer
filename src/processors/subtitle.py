@@ -8,12 +8,10 @@ Supports:
 """
 
 import logging
-import os
 import subprocess
-from pathlib import Path
-from typing import Optional, List, Tuple
 from dataclasses import dataclass
 from datetime import timedelta
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +66,7 @@ class SubtitleGenerator:
                 "faster-whisper not installed. " "Install with: pip install faster-whisper"
             )
 
-    def extract_audio(self, video_path: Path, audio_path: Optional[Path] = None) -> Path:
+    def extract_audio(self, video_path: Path, audio_path: Path | None = None) -> Path:
         """Extract audio from video using ffmpeg.
 
         Args:
@@ -98,7 +96,7 @@ class SubtitleGenerator:
 
         try:
             logger.info(f"Extracting audio from {video_path.name}")
-            result = subprocess.run(
+            subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
@@ -114,7 +112,7 @@ class SubtitleGenerator:
         self,
         audio_path: Path,
         progress_callback=None,
-    ) -> List[SubtitleSegment]:
+    ) -> list[SubtitleSegment]:
         """Transcribe audio to text segments.
 
         Args:
@@ -165,7 +163,7 @@ class SubtitleGenerator:
             logger.error(f"Transcription failed: {e}")
             raise
 
-    def generate_srt(self, segments: List[SubtitleSegment]) -> str:
+    def generate_srt(self, segments: list[SubtitleSegment]) -> str:
         """Generate SRT format subtitle content.
 
         Args:
@@ -188,7 +186,7 @@ class SubtitleGenerator:
 
         return "\n".join(srt_content)
 
-    def generate_vtt(self, segments: List[SubtitleSegment]) -> str:
+    def generate_vtt(self, segments: list[SubtitleSegment]) -> str:
         """Generate WebVTT format subtitle content.
 
         Args:
@@ -232,7 +230,7 @@ class SubtitleGenerator:
     def generate_from_video(
         self,
         video_path: Path,
-        output_path: Optional[Path] = None,
+        output_path: Path | None = None,
         subtitle_format: str = "srt",
         cleanup_audio: bool = True,
         progress_callback=None,
@@ -290,7 +288,7 @@ class SubtitleDownloader:
         video_url: str,
         output_path: Path,
         language: str = "en",
-    ) -> Optional[Path]:
+    ) -> Path | None:
         """Download subtitles from YouTube if available.
 
         Args:
@@ -348,11 +346,11 @@ class SubtitleDownloader:
 
 def get_or_generate_subtitle(
     video_path: Path,
-    video_url: Optional[str] = None,
+    video_url: str | None = None,
     language: str = "en",
     model_size: str = "base",
     prefer_download: bool = True,
-) -> Optional[Path]:
+) -> Path | None:
     """Get subtitle: try downloading first, then generate with Whisper.
 
     Args:

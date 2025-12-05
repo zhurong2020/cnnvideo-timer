@@ -1,7 +1,7 @@
 """Video source adapters."""
 
-from .base import VideoSource, SourceInfo
-from .youtube import YouTubeSource, CNN10Source, BBCLearningEnglishSource, VOASource
+from .base import SourceInfo, VideoSource
+from .youtube import BBCLearningEnglishSource, CNN10Source, VOASource, YouTubeSource
 
 __all__ = [
     "VideoSource",

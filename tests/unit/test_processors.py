@@ -4,9 +4,10 @@ Unit tests for processors module.
 These tests use mocking to avoid requiring FFmpeg and Whisper.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import pytest
 
 
 class TestSubtitleSegment:
@@ -71,7 +72,7 @@ class TestSubtitleGenerator:
         video_path = tmp_path / "test.mp4"
         video_path.touch()
 
-        audio_path = generator.extract_audio(video_path)
+        generator.extract_audio(video_path)
 
         # Should call subprocess.run with ffmpeg
         mock_run.assert_called_once()
