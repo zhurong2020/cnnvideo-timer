@@ -22,6 +22,7 @@ from ...core.task_manager import (
 from ...core.downloader import VideoDownloader
 from ...core.config import get_settings
 from ..dependencies import verify_api_key, get_user_id
+from ...core.quota import get_quota_manager
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -149,8 +150,32 @@ async def create_task(
     user_id: str = Depends(get_user_id),
 ):
     """Create a new video download/processing task."""
+    import logging
+    logger = logging.getLogger(__name__)
+
     settings = get_settings()
     manager = get_task_manager()
+    quota_manager = get_quota_manager()
+
+    # Check user quota FIRST
+    quota_result = quota_manager.check_quota(
+        user_id=user_id,
+        processing_mode=request.processing_mode.value,
+        video_format=request.video_format.value,
+    )
+
+    if not quota_result.allowed:
+        logger.warning(f"Quota denied for user {user_id}: {quota_result.reason}")
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "error": "Quota exceeded",
+                "message": quota_result.reason,
+                "tier": quota_result.tier,
+                "remaining_today": quota_result.remaining_today,
+                "upgrade_url": "/api/v1/quota/tiers",  # Guide to upgrade
+            }
+        )
 
     # Check concurrent task limit
     pending_count = manager.get_pending_tasks_count()
@@ -180,6 +205,10 @@ async def create_task(
         video_title=video_info.title,
         processing_mode=processing_mode,
     )
+
+    # Record quota usage
+    quota_manager.record_task(user_id)
+    logger.info(f"Task created for user {user_id}, quota remaining: {quota_result.remaining_today - 1}")
 
     # Start background processing
     background_tasks.add_task(process_task_background, task.id)
