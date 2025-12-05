@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CNN Video Timer - API Server Entry Point
+SmartNews Learn - API Server Entry Point
 
 Run with:
     python server.py
@@ -24,7 +24,7 @@ def main():
     settings = get_settings()
 
     print("=" * 60)
-    print("CNN Video Timer API Server")
+    print("SmartNews Learn API Server")
     print("=" * 60)
     print(f"  Version:  {settings.app_version}")
     print(f"  Host:     {settings.api_host}")
