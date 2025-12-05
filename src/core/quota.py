@@ -3,17 +3,14 @@ User Quota Management System.
 
 Implements usage limits and tier-based permissions for monetization.
 
-Tier system:
-- FREE: Limited daily usage, lower quality
-- BASIC: More daily usage, HD quality
-- PREMIUM: Unlimited usage, all features
+Tier configuration is loaded from config/tiers.json for easy admin customization.
 """
 
 import json
 import logging
 from pathlib import Path
 from datetime import datetime, date
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Any
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 
@@ -36,34 +33,188 @@ class TierLimits:
     priority: int  # Queue priority (higher = faster)
     ai_subtitle: bool  # Can use Whisper AI subtitle generation
     concurrent_tasks: int  # Max concurrent tasks
+    # Optional pricing info
+    name: str = ""
+    description: str = ""
+    price_monthly: str = ""
+    price_yearly: str = ""
 
 
-# Tier configuration
-TIER_LIMITS: Dict[UserTier, TierLimits] = {
-    UserTier.FREE: TierLimits(
+# Default tier configuration (fallback if config file not found)
+DEFAULT_TIER_LIMITS: Dict[str, TierLimits] = {
+    "free": TierLimits(
         daily_tasks=3,
         max_resolution="480p",
         allowed_modes=["original", "with_subtitle"],
         priority=1,
-        ai_subtitle=False,  # Only YouTube subtitles
+        ai_subtitle=False,
         concurrent_tasks=1,
+        name="Free",
+        description="Basic access",
+        price_monthly="Free",
+        price_yearly="Free",
     ),
-    UserTier.BASIC: TierLimits(
+    "basic": TierLimits(
         daily_tasks=15,
         max_resolution="720p",
         allowed_modes=["original", "with_subtitle", "repeat_twice"],
         priority=5,
         ai_subtitle=True,
         concurrent_tasks=2,
+        name="Basic",
+        description="For regular learners",
+        price_monthly="19",
+        price_yearly="190",
     ),
-    UserTier.PREMIUM: TierLimits(
-        daily_tasks=-1,  # Unlimited
+    "premium": TierLimits(
+        daily_tasks=-1,
         max_resolution="1080p",
         allowed_modes=["original", "with_subtitle", "repeat_twice", "slow"],
         priority=10,
         ai_subtitle=True,
         concurrent_tasks=5,
+        name="Premium",
+        description="Unlimited access",
+        price_monthly="49",
+        price_yearly="490",
     ),
+}
+
+
+class TierConfigManager:
+    """Manages tier configuration from JSON file."""
+
+    def __init__(self, config_path: Optional[Path] = None):
+        """Initialize tier config manager.
+
+        Args:
+            config_path: Path to tiers.json. If None, uses default location.
+        """
+        if config_path is None:
+            # Default to config/tiers.json relative to project root
+            self.config_path = Path(__file__).parent.parent.parent / "config" / "tiers.json"
+        else:
+            self.config_path = Path(config_path)
+
+        self._tier_limits: Dict[str, TierLimits] = {}
+        self._processing_modes: Dict[str, Dict] = {}
+        self._resolutions: List[str] = []
+        self._last_loaded: Optional[datetime] = None
+        self._load_config()
+
+    def _load_config(self) -> None:
+        """Load tier configuration from JSON file."""
+        if self.config_path.exists():
+            try:
+                with open(self.config_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+
+                # Parse tiers
+                for tier_id, tier_data in data.get("tiers", {}).items():
+                    self._tier_limits[tier_id] = TierLimits(
+                        daily_tasks=tier_data.get("daily_tasks", 3),
+                        max_resolution=tier_data.get("max_resolution", "480p"),
+                        allowed_modes=tier_data.get("allowed_modes", ["original"]),
+                        priority=tier_data.get("priority", 1),
+                        ai_subtitle=tier_data.get("ai_subtitle", False),
+                        concurrent_tasks=tier_data.get("concurrent_tasks", 1),
+                        name=tier_data.get("name", tier_id.capitalize()),
+                        description=tier_data.get("description", ""),
+                        price_monthly=tier_data.get("price_monthly", ""),
+                        price_yearly=tier_data.get("price_yearly", ""),
+                    )
+
+                self._processing_modes = data.get("processing_modes", {})
+                self._resolutions = data.get("resolutions", ["360p", "480p", "720p", "1080p"])
+                self._last_loaded = datetime.now()
+
+                logger.info(f"Loaded tier config from {self.config_path}: {len(self._tier_limits)} tiers")
+
+            except Exception as e:
+                logger.warning(f"Failed to load tier config: {e}, using defaults")
+                self._tier_limits = DEFAULT_TIER_LIMITS.copy()
+        else:
+            logger.info(f"Tier config not found at {self.config_path}, using defaults")
+            self._tier_limits = DEFAULT_TIER_LIMITS.copy()
+
+    def reload(self) -> None:
+        """Reload configuration from file."""
+        self._load_config()
+
+    def get_tier_limits(self, tier: str) -> TierLimits:
+        """Get limits for a specific tier."""
+        return self._tier_limits.get(tier, self._tier_limits.get("free", DEFAULT_TIER_LIMITS["free"]))
+
+    def get_all_tiers(self) -> Dict[str, TierLimits]:
+        """Get all tier configurations."""
+        return self._tier_limits.copy()
+
+    def get_tier_ids(self) -> List[str]:
+        """Get list of available tier IDs."""
+        return list(self._tier_limits.keys())
+
+    def get_processing_modes(self) -> Dict[str, Dict]:
+        """Get processing mode definitions."""
+        return self._processing_modes.copy()
+
+    def get_resolutions(self) -> List[str]:
+        """Get available resolutions."""
+        return self._resolutions.copy()
+
+    def update_tier(self, tier_id: str, updates: Dict[str, Any]) -> bool:
+        """Update a tier configuration and save to file.
+
+        Args:
+            tier_id: Tier to update
+            updates: Dictionary of fields to update
+
+        Returns:
+            True if successful
+        """
+        if not self.config_path.exists():
+            return False
+
+        try:
+            with open(self.config_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            if tier_id not in data.get("tiers", {}):
+                return False
+
+            # Update the tier
+            data["tiers"][tier_id].update(updates)
+            data["_last_updated"] = date.today().isoformat()
+
+            with open(self.config_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+
+            # Reload config
+            self._load_config()
+            logger.info(f"Updated tier {tier_id}: {updates}")
+            return True
+
+        except Exception as e:
+            logger.error(f"Failed to update tier config: {e}")
+            return False
+
+
+# Global tier config manager instance
+_tier_config: Optional[TierConfigManager] = None
+
+
+def get_tier_config() -> TierConfigManager:
+    """Get or create tier config manager instance."""
+    global _tier_config
+    if _tier_config is None:
+        _tier_config = TierConfigManager()
+    return _tier_config
+
+
+# Legacy TIER_LIMITS for backward compatibility
+TIER_LIMITS: Dict[UserTier, TierLimits] = {
+    UserTier.FREE: DEFAULT_TIER_LIMITS["free"],
+    UserTier.BASIC: DEFAULT_TIER_LIMITS["basic"],
+    UserTier.PREMIUM: DEFAULT_TIER_LIMITS["premium"],
 }
 
 
@@ -160,11 +311,9 @@ class QuotaManager:
         return user
 
     def get_tier_limits(self, tier: str) -> TierLimits:
-        """Get limits for a tier."""
-        try:
-            return TIER_LIMITS[UserTier(tier)]
-        except (ValueError, KeyError):
-            return TIER_LIMITS[UserTier.FREE]
+        """Get limits for a tier from config file."""
+        tier_config = get_tier_config()
+        return tier_config.get_tier_limits(tier)
 
     def check_quota(
         self,

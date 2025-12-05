@@ -1,0 +1,281 @@
+{
+  "_comment": "Video source configuration - editable by admin",
+  "_last_updated": "2025-01-01",
+
+  "sources": {
+    "cnn10": {
+      "name": "CNN10",
+      "description": "Daily 10-minute student news show",
+      "url": "https://www.youtube.com/@CNN10",
+      "channel_id": "UCPvgFVhyQxvpNMYsetk0i4g",
+      "category": "student_news",
+      "language": "en-US",
+      "difficulty": "intermediate",
+      "typical_duration": "10min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["news", "current events", "education", "student"]
+    },
+
+    "bbc_learning": {
+      "name": "BBC Learning English",
+      "description": "Professional English teaching from BBC",
+      "url": "https://www.youtube.com/@bbclearningenglish",
+      "channel_id": "UCHaHD477h-FeBbVh9Sh7syA",
+      "category": "language_learning",
+      "language": "en-GB",
+      "difficulty": "all_levels",
+      "typical_duration": "1-6min",
+      "update_frequency": "weekly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["grammar", "vocabulary", "pronunciation", "british"],
+      "playlists": {
+        "6_minute_english": "6 Minute English - bite-sized learning",
+        "english_in_a_minute": "English In A Minute - quick tips",
+        "news_review": "News Review - learn from headlines"
+      }
+    },
+
+    "voa_learning": {
+      "name": "VOA Learning English",
+      "description": "Voice of America - slower-paced news for learners",
+      "url": "https://www.youtube.com/@voaboradcatss",
+      "channel_id": "UCK1Cp2VDxkKFgeKa9yQzOYQ",
+      "category": "language_learning",
+      "language": "en-US",
+      "difficulty": "beginner_intermediate",
+      "typical_duration": "1-30min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["slow english", "american", "news", "vocabulary"],
+      "playlists": {
+        "english_in_a_minute": "English In A Minute - American expressions",
+        "american_stories": "American Stories - reading practice",
+        "lets_learn_english": "Let's Learn English - beginner course"
+      }
+    },
+
+    "nhk_world": {
+      "name": "NHK World-Japan",
+      "description": "Japan's international news in English",
+      "url": "https://www.youtube.com/@NHKWORLDJAPAN",
+      "channel_id": "UCQ3PvCtvNR8xEUxAjwJsKEw",
+      "category": "international_news",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "2-30min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["japan", "asia", "international", "news"]
+    },
+
+    "dw_news": {
+      "name": "DW News",
+      "description": "Deutsche Welle - German international news in English",
+      "url": "https://www.youtube.com/@DWNews",
+      "channel_id": "UCknLrEdhRCp1aegoMqRaCZg",
+      "category": "international_news",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "2-15min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["europe", "germany", "international", "news"]
+    },
+
+    "abc_news": {
+      "name": "ABC News",
+      "description": "American ABC News clips",
+      "url": "https://www.youtube.com/@ABCNews",
+      "channel_id": "UCBi2mrWuNuyYy4gbM6fU18Q",
+      "category": "mainstream_news",
+      "language": "en-US",
+      "difficulty": "advanced",
+      "typical_duration": "2-10min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["american", "breaking news", "politics"]
+    },
+
+    "nbc_news": {
+      "name": "NBC News",
+      "description": "NBC News video clips",
+      "url": "https://www.youtube.com/@NBCNews",
+      "channel_id": "UCeY0bbntWzzVIaj2z3QigXg",
+      "category": "mainstream_news",
+      "language": "en-US",
+      "difficulty": "advanced",
+      "typical_duration": "2-10min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["american", "breaking news", "politics"]
+    },
+
+    "cbs_news": {
+      "name": "CBS News",
+      "description": "CBS News video clips",
+      "url": "https://www.youtube.com/@CBSNews",
+      "channel_id": "UC8p1vwvWtl6T73JiExfWs1g",
+      "category": "mainstream_news",
+      "language": "en-US",
+      "difficulty": "advanced",
+      "typical_duration": "2-10min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["american", "breaking news", "60 minutes"]
+    },
+
+    "bbc_news": {
+      "name": "BBC News",
+      "description": "BBC World News clips",
+      "url": "https://www.youtube.com/@BBCNews",
+      "channel_id": "UC16niRr50-MSBwiO3YDb3RA",
+      "category": "international_news",
+      "language": "en-GB",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "2-15min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["british", "world news", "international"]
+    },
+
+    "reuters": {
+      "name": "Reuters",
+      "description": "Reuters news agency videos",
+      "url": "https://www.youtube.com/@Reuters",
+      "channel_id": "UChqUTb7kYRX8-EiaN3XFrSQ",
+      "category": "wire_service",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "1-5min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["wire service", "short clips", "breaking news"]
+    },
+
+    "ap_news": {
+      "name": "AP News",
+      "description": "Associated Press news videos",
+      "url": "https://www.youtube.com/@AssociatedPress",
+      "channel_id": "UC52X5wxOL_s5yw0dQk7NtgA",
+      "category": "wire_service",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "1-5min",
+      "update_frequency": "hourly",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["wire service", "short clips", "breaking news"]
+    },
+
+    "world_a_to_z": {
+      "name": "The World from A to Z",
+      "description": "Carl Azuz's new student news channel (former CNN10 host)",
+      "url": "https://www.youtube.com/@theworldfromatoz",
+      "channel_id": null,
+      "category": "student_news",
+      "language": "en-US",
+      "difficulty": "intermediate",
+      "typical_duration": "9min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["student news", "education", "current events"]
+    },
+
+    "al_jazeera": {
+      "name": "Al Jazeera English",
+      "description": "Al Jazeera international news",
+      "url": "https://www.youtube.com/@aborijajezaerilenglish",
+      "channel_id": "UCNye-wNBqNL5ZzHSJj3l8Bg",
+      "category": "international_news",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "2-25min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["middle east", "international", "documentaries"]
+    },
+
+    "france24_english": {
+      "name": "France 24 English",
+      "description": "French international news in English",
+      "url": "https://www.youtube.com/@FRANCE24English",
+      "channel_id": "UCQfwfsi5VrQ8yKZ-UWmAEFg",
+      "category": "international_news",
+      "language": "en",
+      "difficulty": "intermediate_advanced",
+      "typical_duration": "2-15min",
+      "update_frequency": "daily",
+      "subtitle_available": true,
+      "enabled": true,
+      "tags": ["france", "europe", "international"]
+    }
+  },
+
+  "categories": {
+    "student_news": {
+      "name": "Student News",
+      "description": "News programs designed for students and learners",
+      "recommended_for": ["beginner", "intermediate"]
+    },
+    "language_learning": {
+      "name": "Language Learning",
+      "description": "Channels specifically for English learners",
+      "recommended_for": ["beginner", "intermediate"]
+    },
+    "international_news": {
+      "name": "International News",
+      "description": "Global news from various perspectives",
+      "recommended_for": ["intermediate", "advanced"]
+    },
+    "mainstream_news": {
+      "name": "Mainstream News",
+      "description": "Major US/UK news networks",
+      "recommended_for": ["advanced"]
+    },
+    "wire_service": {
+      "name": "Wire Services",
+      "description": "Short news clips from news agencies",
+      "recommended_for": ["intermediate", "advanced"]
+    }
+  },
+
+  "difficulty_levels": {
+    "beginner": {
+      "name": "Beginner",
+      "description": "Slower speech, simpler vocabulary"
+    },
+    "beginner_intermediate": {
+      "name": "Beginner-Intermediate",
+      "description": "Designed for learners, clear pronunciation"
+    },
+    "intermediate": {
+      "name": "Intermediate",
+      "description": "Standard news pace, common vocabulary"
+    },
+    "intermediate_advanced": {
+      "name": "Intermediate-Advanced",
+      "description": "Natural speech pace, varied topics"
+    },
+    "advanced": {
+      "name": "Advanced",
+      "description": "Native speed, complex topics"
+    },
+    "all_levels": {
+      "name": "All Levels",
+      "description": "Content for all proficiency levels"
+    }
+  }
+}

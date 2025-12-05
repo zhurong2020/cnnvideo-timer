@@ -1,0 +1,64 @@
+{
+  "_comment": "User tier configuration - editable by admin",
+  "_last_updated": "2025-01-01",
+
+  "tiers": {
+    "free": {
+      "name": "Free",
+      "description": "Basic access for casual users",
+      "daily_tasks": 3,
+      "max_resolution": "480p",
+      "allowed_modes": ["original", "with_subtitle"],
+      "priority": 1,
+      "ai_subtitle": false,
+      "concurrent_tasks": 1,
+      "price_monthly": "Free",
+      "price_yearly": "Free"
+    },
+    "basic": {
+      "name": "Basic",
+      "description": "For regular learners",
+      "daily_tasks": 15,
+      "max_resolution": "720p",
+      "allowed_modes": ["original", "with_subtitle", "repeat_twice"],
+      "priority": 5,
+      "ai_subtitle": true,
+      "concurrent_tasks": 2,
+      "price_monthly": "19",
+      "price_yearly": "190"
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Unlimited access for power users",
+      "daily_tasks": -1,
+      "max_resolution": "1080p",
+      "allowed_modes": ["original", "with_subtitle", "repeat_twice", "slow"],
+      "priority": 10,
+      "ai_subtitle": true,
+      "concurrent_tasks": 5,
+      "price_monthly": "49",
+      "price_yearly": "490"
+    }
+  },
+
+  "processing_modes": {
+    "original": {
+      "name": "Original",
+      "description": "Original video without modification"
+    },
+    "with_subtitle": {
+      "name": "With Subtitles",
+      "description": "Video with embedded subtitles (YouTube or AI-generated)"
+    },
+    "repeat_twice": {
+      "name": "Repeat Twice",
+      "description": "Each sentence repeated twice for practice"
+    },
+    "slow": {
+      "name": "Slow Motion",
+      "description": "Slower playback speed for detailed listening"
+    }
+  },
+
+  "resolutions": ["360p", "480p", "720p", "1080p"]
+}
