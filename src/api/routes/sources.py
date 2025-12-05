@@ -26,7 +26,9 @@ def _tier_to_enum(tier: UserTier) -> UserTierEnum:
 
 @router.get("", response_model=SourceListResponse)
 async def list_sources(
-    tier: UserTierEnum = Query(default=UserTierEnum.FREE, description="User tier to filter sources")
+    tier: UserTierEnum = Query(
+        default=UserTierEnum.FREE, description="User tier to filter sources"
+    ),
 ):
     """Get list of available video sources."""
     all_sources = get_all_sources()

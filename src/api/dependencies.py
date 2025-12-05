@@ -2,14 +2,13 @@
 API dependencies for authentication and validation.
 """
 
-
 from fastapi import Header, HTTPException, status
 
 from ..core.config import get_settings
 
 
 async def verify_api_key(
-    x_api_key: str | None = Header(None, description="API Key for authentication")
+    x_api_key: str | None = Header(None, description="API Key for authentication"),
 ) -> str:
     """
     Verify API key from request headers.
@@ -47,7 +46,7 @@ async def verify_api_key(
 
 
 async def get_user_id(
-    x_user_id: str | None = Header(None, description="User ID for task ownership")
+    x_user_id: str | None = Header(None, description="User ID for task ownership"),
 ) -> str:
     """
     Extract user ID from request headers.

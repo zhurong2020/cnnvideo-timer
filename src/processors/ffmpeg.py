@@ -293,7 +293,7 @@ class FFmpegProcessor:
             raise ValueError("Speed factor must be positive")
 
         # Calculate PTS and audio tempo
-        video_filter = f"setpts={1/speed_factor}*PTS"
+        video_filter = f"setpts={1 / speed_factor}*PTS"
         audio_filter = f"atempo={speed_factor}"
 
         # atempo only supports 0.5-2.0, chain if needed

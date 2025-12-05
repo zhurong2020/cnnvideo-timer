@@ -63,7 +63,7 @@ class SubtitleGenerator:
             logger.info("Whisper model loaded successfully")
         except ImportError:
             raise ImportError(
-                "faster-whisper not installed. " "Install with: pip install faster-whisper"
+                "faster-whisper not installed. Install with: pip install faster-whisper"
             )
 
     def extract_audio(self, video_path: Path, audio_path: Path | None = None) -> Path:

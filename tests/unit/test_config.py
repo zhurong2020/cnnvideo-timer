@@ -3,7 +3,6 @@ Unit tests for configuration module.
 """
 
 
-
 class TestSettings:
     """Tests for Settings class."""
 

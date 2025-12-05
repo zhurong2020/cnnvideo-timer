@@ -2,7 +2,6 @@
 Unit tests for task manager module.
 """
 
-
 import pytest
 
 

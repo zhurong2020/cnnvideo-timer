@@ -3,7 +3,6 @@ Integration tests for API endpoints.
 """
 
 
-
 class TestHealthEndpoint:
     """Tests for health check endpoint."""
 

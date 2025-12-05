@@ -29,9 +29,7 @@ class TierUpdateRequest(BaseModel):
     """Request to update tier configuration."""
 
     daily_tasks: int | None = Field(None, description="Max tasks per day (-1 for unlimited)")
-    max_resolution: str | None = Field(
-        None, description="Max resolution (360p, 480p, 720p, 1080p)"
-    )
+    max_resolution: str | None = Field(None, description="Max resolution (360p, 480p, 720p, 1080p)")
     allowed_modes: list[str] | None = Field(None, description="Allowed processing modes")
     priority: int | None = Field(None, description="Queue priority")
     ai_subtitle: bool | None = Field(None, description="Allow AI subtitle generation")

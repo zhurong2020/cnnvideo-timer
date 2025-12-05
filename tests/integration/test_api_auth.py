@@ -3,7 +3,6 @@ Integration tests for API authentication.
 """
 
 
-
 class TestAPIAuthentication:
     """Tests for API authentication middleware."""
 
