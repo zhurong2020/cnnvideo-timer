@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .routes import tasks_router, sources_router
+from .routes.storage import router as storage_router
 from .models import HealthResponse, ErrorResponse
 from ..core.config import get_settings
 from ..core.task_manager import get_task_manager
@@ -82,6 +83,7 @@ def create_app() -> FastAPI:
     # Include routers
     app.include_router(tasks_router, prefix="/api/v1")
     app.include_router(sources_router, prefix="/api/v1")
+    app.include_router(storage_router)  # Already has /api/v1 prefix
 
     # Health check endpoint
     @app.get("/health", response_model=HealthResponse, tags=["health"])

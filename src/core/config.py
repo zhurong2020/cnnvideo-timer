@@ -62,9 +62,15 @@ class Settings(BaseSettings):
     max_concurrent_tasks: int = 2
     task_retention_hours: int = 24  # Keep completed tasks for 24 hours
 
+    # Storage settings
+    storage_quota_gb: float = 10.0  # Storage quota in GB
+    cache_hours: int = 24  # How long to keep cached videos
+    default_video_format: str = "720p"  # Default video format
+
     # OneDrive (rclone) settings
     rclone_remote: Optional[str] = None  # e.g., "onedrive:videos"
     enable_onedrive: bool = False
+    onedrive_quota_gb: float = 10.0  # Limit OneDrive usage
 
     # SMTP settings (for notifications)
     smtp_server: str = "smtp.gmail.com"

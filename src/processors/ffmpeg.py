@@ -145,7 +145,9 @@ class FFmpegProcessor:
             default_style.update(subtitle_style)
 
         # Build filter string
-        filter_str = f"subtitles={subtitle_path}:force_style='"
+        # FFmpeg subtitles filter requires escaping backslashes and colons on Windows
+        escaped_path = str(subtitle_path).replace("\\", "/").replace(":", "\\:")
+        filter_str = f"subtitles={escaped_path}:force_style='"
         filter_str += ','.join(f"{k}={v}" for k, v in default_style.items())
         filter_str += "'"
 

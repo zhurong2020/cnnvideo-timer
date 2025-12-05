@@ -26,6 +26,15 @@ class ProcessingModeEnum(str, Enum):
     SLOW = "slow"
 
 
+class VideoFormatEnum(str, Enum):
+    """Available video formats/resolutions."""
+    LOW_360P = "360p"
+    MEDIUM_480P = "480p"
+    HD_720P = "720p"
+    FULL_HD_1080P = "1080p"
+    AUDIO_ONLY = "audio_only"
+
+
 class UserTierEnum(str, Enum):
     FREE = "free"
     BASIC = "basic"
@@ -41,13 +50,18 @@ class TaskCreateRequest(BaseModel):
         default=ProcessingModeEnum.WITH_SUBTITLE,
         description="Video processing mode"
     )
+    video_format: VideoFormatEnum = Field(
+        default=VideoFormatEnum.HD_720P,
+        description="Video format/resolution (360p, 480p, 720p, 1080p, audio_only)"
+    )
 
     model_config = {
         "json_schema_extra": {
             "examples": [{
                 "source_id": "cnn10",
                 "video_url": "https://www.youtube.com/watch?v=abc123",
-                "processing_mode": "with_subtitle"
+                "processing_mode": "with_subtitle",
+                "video_format": "720p"
             }]
         }
     }
@@ -127,3 +141,35 @@ class ErrorResponse(BaseModel):
     """Error response."""
     error: str
     detail: Optional[str] = None
+
+
+class VideoFormatInfo(BaseModel):
+    """Video format information."""
+    id: str
+    description: str
+    estimated_size_mb_per_min: float
+
+
+class VideoFormatsResponse(BaseModel):
+    """List of available video formats."""
+    formats: List[VideoFormatInfo]
+    default_format: str
+
+
+class StorageStatsResponse(BaseModel):
+    """Storage statistics response."""
+    total_size_mb: float
+    file_count: int
+    quota_gb: float
+    quota_used_percent: float
+    cache_hours: int
+    onedrive_enabled: bool
+    onedrive_usage_mb: Optional[float] = None
+
+
+class MaintenanceResponse(BaseModel):
+    """Maintenance operation response."""
+    files_removed: int
+    bytes_freed_mb: float
+    storage_before_mb: float
+    storage_after_mb: float

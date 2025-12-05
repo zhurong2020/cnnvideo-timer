@@ -15,6 +15,7 @@ from enum import Enum
 
 from .ffmpeg import FFmpegProcessor
 from .subtitle import get_or_generate_subtitle
+from src.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,10 @@ class LearningModeProcessor:
 
     def __init__(self):
         """Initialize learning mode processor."""
-        self.ffmpeg = FFmpegProcessor()
+        settings = get_settings()
+        ffmpeg_path = settings.ffmpeg_path or "ffmpeg"
+        ffprobe_path = ffmpeg_path.replace("ffmpeg", "ffprobe") if settings.ffmpeg_path else "ffprobe"
+        self.ffmpeg = FFmpegProcessor(ffmpeg_path=ffmpeg_path, ffprobe_path=ffprobe_path)
 
     def process(
         self,
